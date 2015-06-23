@@ -218,7 +218,8 @@ if(@txpinterface === 'admin') {
 // ********************
 // -------------------------------------------------------------
 // CSS definitions: hopefully kind to themers
-function smd_ebook_get_style_rules() {
+function smd_ebook_get_style_rules()
+{
     $smd_ebook_styles = array(
         'cpanel' => '
 .smd_hidden { display:none; }
@@ -255,7 +256,8 @@ function smd_ebook_get_style_rules() {
 }
 
 // -------------------------------------------------------------
-function smd_ebook_inject_css($evt, $stp) {
+function smd_ebook_inject_css($evt, $stp)
+{
     global $smd_ebook_event, $event;
 
     if ($event === $smd_ebook_event) {
@@ -268,7 +270,8 @@ function smd_ebook_inject_css($evt, $stp) {
 }
 
 // Plugin jump off point
-function smd_ebook_dispatcher($evt, $stp) {
+function smd_ebook_dispatcher($evt, $stp)
+{
     global $smd_ebook_event;
 
     $available_steps = array(
@@ -287,7 +290,7 @@ function smd_ebook_dispatcher($evt, $stp) {
 
     if ($stp === 'save_pane_state') {
         smd_ebook_save_pane_state();
-    } else if ($stp and bouncer($stp, $available_steps)) {
+    } elseif ($stp and bouncer($stp, $available_steps)) {
         $stp();
     } else {
         $smd_ebook_event();
@@ -295,8 +298,10 @@ function smd_ebook_dispatcher($evt, $stp) {
 }
 
 // ------------------------
-function smd_ebook_welcome($evt, $stp) {
+function smd_ebook_welcome($evt, $stp)
+{
     $msg = '';
+
     switch ($stp) {
         case 'installed':
             $msg = 'Go publish!';
@@ -305,18 +310,21 @@ function smd_ebook_welcome($evt, $stp) {
             smd_ebook_prefs_remove(0);
             break;
     }
+
     return $msg;
 }
 
 // ------------------------
 // Stub with correct signature for being called via Txp
-function smd_ebook($evt='', $stp='') {
+function smd_ebook($evt='', $stp='')
+{
     smd_ebook_ui();
 }
 
 // ------------------------
 // Interface for compiling the book
-function smd_ebook_ui($msg='', $listfile='', $report = '', $retval='', $ebook_folder='') {
+function smd_ebook_ui($msg='', $listfile='', $report = '', $retval='', $ebook_folder='')
+{
     global $smd_ebook_event, $smd_ebook_prefs;
 
     pagetop(gTxt('smd_ebook_tab_name'), $msg);
@@ -410,9 +418,11 @@ function smd_ebook_ui($msg='', $listfile='', $report = '', $retval='', $ebook_fo
         // Build dropdown list of articles: not using selectInput() because it doesn't support multiples
         $alist = array();
         $alist[] = '<select name="smd_ebook_articles[]" id="smd_ebook_articles" class="list multiple" multiple="multiple" size="12" required="">';
+
         foreach ($articles as $row) {
             $alist[] = '<option value="smd_ebook_article_'.txpspecialchars($row['ID']).'">' . txpspecialchars($row['Title']) . '</option>';
         }
+
         $alist[] = '</select>';
 
         echo n.'<div id="'.$smd_ebook_event.'_container" class="txp-container">';
@@ -628,6 +638,7 @@ EOJS;
         // 'Generate book' and 'download' buttons
         echo '<div class="smd_ebook_pub_options">';
         echo n.fInput('submit', 'smd_ebook_generate', gTxt('smd_ebook_lbl_generate'), 'publish smd_ebook_pub');
+
         if ($retval <= 1) {
             $info = explode('.', $listfile);
             $basepart = array_slice($info, 0, count($info)-1);
@@ -704,6 +715,7 @@ EOJS;
                             echo n. '[<a href="#" class="smd_ebook_image_toggle">' . gTxt('smd_ebook_lbl_img_list') . '</a>]' . tag(join(n, $image_list), 'ul');
                         }
                     }
+
                     $image_list = array();
                     echo n.'</div>';
                     echo n.'<div class="smd_ebook_file_group">';
@@ -739,7 +751,8 @@ EOJS;
 }
 
 // ------------------------
-function smd_ebook_loadfile() {
+function smd_ebook_loadfile()
+{
     $name = sanitizeForFile(ps('name'));
     $folder = sanitizeForFile(ps('folder'));
     $file = file(get_pref('tempdir') . DS . $folder . DS . $name);
@@ -750,24 +763,28 @@ function smd_ebook_loadfile() {
 }
 
 // ------------------------
-function smd_ebook_savefile() {
+function smd_ebook_savefile()
+{
     $name = sanitizeForFile(ps('name'));
     $folder = sanitizeForFile(ps('folder'));
     $content = ps('data');
     $fp = fopen(get_pref('tempdir') . DS . $folder . DS . $name, "wb");
     fwrite($fp, trim($content));
     fclose($fp);
+
     if ($fp) {
         echo json_encode(array('result' => 'ok'));
     } else {
         echo json_encode(array('result' => 'fail'));
     }
+
     exit; // Don't display page_end
 }
 
 // ------------------------
 // Extract a subset of the HTML file for display
-function smd_ebook_viewfile() {
+function smd_ebook_viewfile()
+{
     global $path_to_site;
 
     $name = sanitizeForFile(ps('name'));
@@ -796,13 +813,15 @@ function smd_ebook_viewfile() {
         // Translate any images with absolute paths into URLs
         echo json_encode(array('data' => str_replace($path_to_site.DS, ihu, $out)));
     }
+
     exit; // Don't display page_end
 }
 
 // ------------------------
 // Return a base64 representation of an image
 // TODO: try getting the image directly via ihu instead of encoding it: faster
-function smd_ebook_viewimage() {
+function smd_ebook_viewimage()
+{
     global $img_dir;
 
     $name = sanitizeForFile(ps('name'));
@@ -839,7 +858,8 @@ function smd_ebook_viewimage() {
 }
 
 // ------------------------
-function smd_ebook_crush_options() {
+function smd_ebook_crush_options()
+{
     global $plugins;
 
     $smd_crushers = array();
@@ -860,7 +880,8 @@ function smd_ebook_crush_options() {
 }
 
 // ------------------------
-function smd_ebook_templates() {
+function smd_ebook_templates()
+{
     // .opf file template
     $template['opf'] = <<<EOOPF
 <?xml version="1.0" encoding="{smd_ebook_encoding}"?>
@@ -1131,7 +1152,8 @@ EOXSL;
 // ------------------------
 // Stage 1: create the files necessary for generation of the book.
 // The actual generation via kindlegen / zip is a separate step.
-function smd_ebook_create() {
+function smd_ebook_create()
+{
     global $smd_ebook_prefs, $img_dir;
 
     @include_once txpath.'/lib/classTextile.php';
@@ -1148,6 +1170,7 @@ function smd_ebook_create() {
     // folder for this book. Just keeps the clutter down..
     $ebook_folder = 'smd_ebook_' . substr(md5(serialize($_POST)), 0, 12);
     $ebook_path = get_pref('tempdir') . DS . $ebook_folder . DS;
+
     if (!is_readable($ebook_path)) {
         mkdir($ebook_path);
     }
@@ -1188,8 +1211,10 @@ function smd_ebook_create() {
 
     $sheetlist = $sheetcontent = array();
     $sheet_count = 0;
+
     foreach ($sheets as $stylething) {
         $content = trim($stylething['css']);
+
         if ($is_mobi && $content) {
             // Inline style tags
             $sheetlist[] = '<style type="text/css">' . $content . '</style>';
@@ -1203,6 +1228,7 @@ function smd_ebook_create() {
             $article_refs[] = '<item id="smd_ebook_style_'.$sheet_count.'" media-type="text/css" href="'.$sheetname.'" />';
             $lfout[] = $sheetname;
         }
+
         $sheet_count++;
     }
 
@@ -1281,6 +1307,7 @@ function smd_ebook_create() {
                     $valfld = str_replace('SMD_FLD_', '', $val);
                     $val = isset($row[$valfld]) ? ( ($valfld === 'AuthorID') ? get_author_name($row[$valfld]) : $row[$valfld] ) : '';
                 }
+
                 if ($val) {
                     $reps['{smd_ebook_md_creator}'] = '<dc:creator>'.$val.'</dc:creator>';
                     $reps['{smd_ebook_creator}'] = $val;
@@ -1317,12 +1344,15 @@ function smd_ebook_create() {
                     // Only GIFs, JPGs or PNGs need apply
                     if ($img) {
                         $mime_type = (($img['ext'] === '.jpg' || $img['ext'] === '.jpeg') ? 'image/jpeg' : (($img['ext'] === '.gif') ? 'image/gif' : (($img['ext'] === '.png') ? 'image/png' : '')));
+
                         if ($mime_type) {
                             $img_file = $img['id'] . $img['ext'];
                             $reps['{smd_ebook_md_cover}'] = '<meta name="cover" content="cover-image" />';
+
                             if ($is_epub) {
                                 $img_dest = 'cover' . $img['ext'];
                                 $ret = copy(get_pref('path_to_site') . DS . $img_dir . DS . $img_file, $ebook_path . $img_dest);
+
                                 if ($ret) {
                                     // Write the cover image HTML
                                     $fp = fopen($ebook_path . $cover_file, "wb");
@@ -1364,7 +1394,7 @@ function smd_ebook_create() {
                         // has just been found, populate the raw title too
                         if ($thingy === 'title') {
                             $reps['{smd_ebook_title}'] = $content;
-                        } else if ($thingy === 'chaptitle') {
+                        } elseif ($thingy === 'chaptitle') {
                             // Chapter title has an associated heading level
                             $reps['{smd_ebook_chaptitle}'] = '<h'.$hdg.'>'.$content.'</h'.$hdg.'>';
                         }
@@ -1375,10 +1405,12 @@ function smd_ebook_create() {
             // Price (SRP) can also come from a field but it needs some special jiggery pokery
             if (!isset($reps['{smd_ebook_md_srp}'])) {
                 $val = ps('smd_ebook_fld_srp');
+
                 if (strpos($val, 'SMD_FLD_') !== false) {
                     $valfld = str_replace('SMD_FLD_', '', $val);
                     $val = isset($row[$valfld]) ? $row[$valfld] : '';
                 }
+
                 if ($val) {
                     $parts = do_list($val, '|');
                     $parts[0] = $parts[0] ? $parts[0] : '0.00';
@@ -1391,10 +1423,12 @@ function smd_ebook_create() {
             // and needs adding to the .ncx (but not to the ToC)
             if (!isset($reps['{smd_ebook_manifest_authornote}'])) {
                 $val = ps('smd_ebook_fld_authornote');
+
                 if (strpos($val, 'SMD_FLD_') !== false) {
                     $valfld = str_replace('SMD_FLD_', '', $val);
                     $val = isset($row[$valfld]) ? $row[$valfld] : '';
                 }
+
                 if ($val) {
                     $reps['{smd_ebook_manifest_authornote}'] = '<item id="smd_ebook_notes" media-type="application/xhtml+xml" href="'. $notefile.'" />';
                     $reps['{smd_ebook_spine_authornote}'] = '<itemref idref="smd_ebook_notes" />';
@@ -1446,9 +1480,11 @@ function smd_ebook_create() {
             $html_content = preg_replace('/\r\n/', "\n", $html_content);
 
             $dom_ok = $doc->loadHTML($html_content);
+
             if ($dom_ok) {
                 $items = $doc->getElementsByTagName('*');
                 $offset = $toc_cnt = 0;
+
                 foreach ($items as $item) {
                     if ($autotoc && !$item->hasAttribute('id') && preg_match('/h(['.$autohed.'])/i', $item->nodeName, $matches)) {
                         // It's a heading. Make the anchor chain based on the heading level
@@ -1461,6 +1497,7 @@ function smd_ebook_create() {
                         $ncx_cnt++;
                         $toc_cnt++;
                         $hashval = $item->getAttribute('id');
+
                         if ( (!isset($guide_refs['text'])) && ($toc_cnt === 1) ) {
                             $guide_href = $firstfile . (($hashval && $is_mobi) ? '#'.$hashval : '');
                             $guide_refs['text'] = '<reference type="text" title="'.gTxt('smd_ebook_lbl_text').'" href="' . $guide_href . '" />';
@@ -1501,8 +1538,10 @@ function smd_ebook_create() {
                         if ($mime_type) {
                             $img = safe_row('*', 'txp_image', "id='" . intval($bits['filename']) . "'");
                             $img['name'] = trim($img['name']);
+
                             if ($img) {
                                 $ret = copy(get_pref('path_to_site') . DS . $img_dir . DS . $bits['basename'], $ebook_path . $bits['basename']);
+
                                 if ($ret) {
                                     if (!in_array($bits['basename'], $master_image_refs)) {
                                         $from = array('{smd_ebook_image_link}', '{smd_ebook_image_type}', '{smd_ebook_image_id}');
@@ -1620,10 +1659,12 @@ function smd_ebook_create() {
     $reps['{smd_ebook_md_subject}'] = (!isset($reps['{smd_ebook_md_subject}'])) ? '' : $reps['{smd_ebook_md_subject}'];
     $reps['{smd_ebook_md_publisher}'] = (!isset($reps['{smd_ebook_md_publisher}'])) ? '' : $reps['{smd_ebook_md_publisher}'];
     $reps['{smd_ebook_md_srp}'] = (!isset($reps['{smd_ebook_md_srp}'])) ? '' : $reps['{smd_ebook_md_srp}'];
+
     if (!isset($reps['{smd_ebook_md_cover}'])) {
         $reps['{smd_ebook_md_cover}'] = '';
         $reps['{smd_ebook_manifest_cover}'] = '';
     }
+
     if (!isset($reps['{smd_ebook_manifest_authornote}'])) {
         $reps['{smd_ebook_manifest_authornote}'] =  '';
         $reps['{smd_ebook_spine_authornote}'] =  '';
@@ -1633,6 +1674,7 @@ function smd_ebook_create() {
     // First, create the TOC and write it to the filesystem
     if ($toc_cnt > 0) {
         $reps['{smd_ebook_spine_toc}'] = '<itemref idref="'.$toc_ref.'" />';
+
         if (!isset($guide_refs['toc'])) {
             $reps['{smd_ebook_manifest_toc}'] = '<item id="'.$toc_ref.'" media-type="application/xhtml+xml" href="'.$toc_file.'" />';
             $guide_refs['toc'] = '<reference type="toc" title="' . gTxt('smd_ebook_lbl_toc') . '" href="'.$toc_file.'" />';
@@ -1718,6 +1760,7 @@ function smd_ebook_create() {
             fclose($fp);
             $lfout[] = $end_file;
         }
+
         $reps['{smd_ebook_md_x}'] = '';
         $reps['{smd_ebook_guide_cover}'] = '<reference type="cover" title="Cover" href="cover.html" />';
         $reps['{smd_ebook_spine_cover}'] = '<itemref idref="cover" linear="no" />';
@@ -1754,7 +1797,8 @@ function smd_ebook_create() {
 // Stage 2 only: Pre-requisites are that the necessary files (toc, .html, ncx + opf)
 // have already been generated by the previous stage. If called directly via the
 // GUI, the hidden form value containing the OPF file is read.
-function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_folder='') {
+function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_folder='')
+{
     global $smd_ebook_prefs, $img_dir;
 
     $report = array();
@@ -1771,11 +1815,13 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
     // File credentials
     $outpath = get_pref('tempdir') . DS . $ebook_folder . DS;
     $outfile = ps('smd_ebook_pubfile');
+
     if (empty($outfile)) {
         $info = explode('.', $listfile);
         $basepart = array_slice($info, 0, count($info)-1);
         $outfile = join('', $basepart);
     }
+
     $outfile .= (($is_epub) ? '.epub' : (($is_mobi) ? '.mobi' : ''));
 
     $downloadit = ps('smd_ebook_download');
@@ -1783,7 +1829,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
 
     if ($downloadit) {
         smd_ebook_download($outpath . $outfile);
-    } else if ($fileit) {
+    } elseif ($fileit) {
 
         @include_once txpath.'/include/txp_file.php';
 
@@ -1803,10 +1849,12 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
         $description = $title = '';
         if ($dom_ok) {
             $items = $doc->getElementsByTagName('*');
+
             foreach ($items as $item) {
                 if ($item->nodeName === 'dc:title') {
                     $title = $item->nodeValue;
                 }
+
                 if ($item->nodeName === 'dc:description') {
                     $description = $item->nodeValue;
                 }
@@ -1827,6 +1875,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
                 ",
                 "id='".doSlash($curid)."'"
             );
+
             if ($ret) {
                 $msg = gTxt('smd_ebook_updated', array('{id}' => $curid));
             } else {
@@ -1836,6 +1885,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
         } else {
             // Make a new entry in the database for it
             $newid = file_db_add(doSlash($outfile), doSlash($filecat), '', doSlash($description), doSlash($filesize), doSlash($title));
+
             if ($newid) {
                 $msg = gTxt('smd_ebook_filed', array('{id}' => $newid));
             } else {
@@ -1922,6 +1972,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
                         case 'opf':
                             $destfile = $oebps_dir . DS . $file;
                             if (copy($base_dir . $file, $destfile)) {
+
                                 // Translate fixed (image) paths into relative ones
                                 if ($ext === 'html') {
                                     $content = file_get_contents($destfile);
@@ -1930,6 +1981,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
                                     fwrite($fh, $content);
                                     fclose($fh);
                                 }
+
                                 $zip->addFile($oebps_dir . DS . $file, 'OEBPS' . DS . $file);
                                 $report[] = 'Added file: OEBPS' . DS . $file;
                             }
@@ -1974,7 +2026,8 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
 }
 
 // ------------------------
-function smd_ebook_download($fullpath) {
+function smd_ebook_download($fullpath)
+{
     $filesize = filesize($fullpath);
     $outfile = basename($fullpath);
 
@@ -1994,6 +2047,7 @@ function smd_ebook_download($fullpath) {
             ob_flush();
             flush();
         }
+
         fclose($file);
     }
 
@@ -2002,7 +2056,8 @@ function smd_ebook_download($fullpath) {
 
 // ------------------------
 // Interface with kindlegen to generate the .mobi file.
-function smd_ebook_kindlegen($opf, $folder) {
+function smd_ebook_kindlegen($opf, $folder)
+{
     global $smd_ebook_prefs;
 
     $kgen = get_pref('smd_ebook_kindlegen_path', $smd_ebook_prefs['smd_ebook_kindlegen_path']['default']);
@@ -2014,7 +2069,8 @@ function smd_ebook_kindlegen($opf, $folder) {
 
 // ------------------------
 // Common buttons for the interface
-function smd_ebook_buttons($curr='mgr') {
+function smd_ebook_buttons($curr='mgr')
+{
     global $smd_ebook_event;
 
     $ret = array (
@@ -2023,22 +2079,26 @@ function smd_ebook_buttons($curr='mgr') {
         'btnCln' => sLink($smd_ebook_event, 'smd_ebook_tidy', gTxt('smd_ebook_lbl_cln'), 'navlink' . ($curr === 'cln' ? ' smd_active' : '')),
         'btnTst' => href(gTxt('smd_ebook_lbl_tst'), 'index.php?event='.$smd_ebook_event.a.'step=smd_ebook_test'.a.'_txp_token='.form_token(), ' class="navlink"'),
     );
+
     return $ret;
 }
 
 // ------------------------
 // Tidy up the temp dir
-function smd_ebook_tidy($msg='') {
+function smd_ebook_tidy($msg='')
+{
     global $smd_ebook_event;
 
     require_privs('plugin_prefs.'.$smd_ebook_event);
 
     if (ps('smd_ebook_cleanup')) {
         $to_delete = ps('smd_ebook_files');
+
         foreach($to_delete as $del) {
             $path = realpath(get_pref('tempdir') . DS . $del);
             unlink($path);
         }
+
         $msg = gTxt('smd_ebook_deleted');
     }
 
@@ -2069,15 +2129,19 @@ function smd_ebook_tidy($msg='') {
     $filesel = '';
     if ($filelist) {
         $filez = array();
+
         foreach($filelist as $val) {
             $val = basename($val);
             $key = sanitizeForFile($val);
             $filez[$key] = $val;
-       }
+        }
+
         $selout[] = '<select id="smd_ebook_files" name="smd_ebook_files[]" class="list" size="20" multiple="multiple">';
+
         foreach ($filez as $key => $leaf) {
             $selout[] = t.'<option value="'.$key.'">'.txpspecialchars($leaf).'</option>'.n;
         }
+
         $selout[] = '</select>';
         $filesel = join(n, $selout);
     }
@@ -2097,7 +2161,8 @@ function smd_ebook_tidy($msg='') {
 
 // ------------------------
 // Handle the prefs panel
-function smd_ebook_prefs($msg='') {
+function smd_ebook_prefs($msg='')
+{
     global $smd_ebook_event, $smd_ebook_prefs, $step;
 
     require_privs('plugin_prefs.'.$smd_ebook_event);
@@ -2144,16 +2209,17 @@ EOJS;
     foreach ($smd_ebook_prefs as $idx => $prefobj) {
         $val = get_pref($idx, $prefobj['default'], 1);
         $vis = (isset($prefobj['visible']) && !$prefobj['visible']) ? 'smd_hidden' : '';
+
         switch ($prefobj['html']) {
             case 'text_input':
                 $grpout[$prefobj['group']][] = inputLabel($idx, fInput('text', $idx, $val, '', '', '', '', '', $idx), $idx, '', $vis);
-            break;
+                break;
             case 'yesnoradio':
                 $grpout[$prefobj['group']][] = inputLabel($idx, yesnoRadio($idx, $val), '', '', $vis);
-            break;
+                break;
             case 'radioset':
                 $grpout[$prefobj['group']][] = inputLabel($idx, radioSet($prefobj['content'], $idx, $val), '', '', $vis);
-            break;
+                break;
             case 'checkboxset':
                 $vals = do_list($val);
                 $lclout = array();
@@ -2162,15 +2228,15 @@ EOJS;
                     $lclout[] = checkbox($idx.'[]', $cb, $checked). gTxt($val);
                 }
                 $grpout[$prefobj['group']][] = inputLabel($idx, join(n, $lclout), '', '', $vis);
-            break;
+                break;
             case 'selectlist':
                 $grpout[$prefobj['group']][] = inputLabel($idx, selectInput($idx, $prefobj['content'][0], $val, $prefobj['content'][1], '', $idx), $idx, '', $vis);
-            break;
+                break;
             default:
                 if ( strpos($prefobj['html'], 'smd_ebook_') !== false && is_callable($prefobj['html']) ) {
                     $grpout[$prefobj['group']][] = inputLabel($idx, $prefobj['html']($idx, $val), $idx, '', $vis);
                 }
-            break;
+                break;
         }
     }
 
@@ -2180,9 +2246,11 @@ EOJS;
                 n. '<a href="#' . $grp . '" role="button">' . gTxt($grp) . '</a>'.
                 n. '</h3>'.
                 n. '<div id="' . $grp . '" class="toggle" role="group" style="display:' . (get_pref('pane_'.$grp.'_visible') ? 'block' : 'none') . '">';
+
         foreach ($content as $row) {
             $out[] = $row;
         }
+
         $out[] = '</div>';
         $out[] = '</div>';
     }
@@ -2204,7 +2272,8 @@ EOJS;
 
 // ------------------------
 // Delete plugin prefs
-function smd_ebook_prefs_remove($showpane=1) {
+function smd_ebook_prefs_remove($showpane=1)
+{
     $message = '';
 
     safe_delete('txp_prefs', "name like 'smd_ebook_%'");
@@ -2217,7 +2286,8 @@ function smd_ebook_prefs_remove($showpane=1) {
 
 // ------------------------
 // Mini diagnostics to see if the kindlegen program can be run on this host.
-function smd_ebook_test() {
+function smd_ebook_test()
+{
     global $smd_ebook_event, $smd_ebook_prefs;
 
     require_privs('plugin_prefs.'.$smd_ebook_event);
@@ -2231,18 +2301,20 @@ function smd_ebook_test() {
         switch ($retval) {
             case 126:
                 $out = gTxt('smd_ebook_permissions_issue');
-            break;
+                break;
             case 127:
                 $out = gTxt('smd_ebook_not_found');
-            break;
+                break;
             default:
                 $out = gTxt('smd_ebook_error_code', array('{code}' => $retval));
-            break;
+                break;
         }
+
         $out = print_r($output, true);
     } else {
         $out = gTxt('smd_ebook_ok');
     }
+
     $_POST['smd_ebook_test_output'] = $out;
     $msg = gTxt('smd_ebook_test_complete');
     smd_ebook_prefs($msg);
@@ -2250,7 +2322,8 @@ function smd_ebook_test() {
 
 // ------------------------
 // List of numbers for heading levels
-function smd_ebook_number($name, $val='') {
+function smd_ebook_number($name, $val='')
+{
     // Can't use range() since it creates indices starting at 0
     $nums = array();
     for ($idx = 1; $idx <= 6; $idx++) {
@@ -2261,7 +2334,8 @@ function smd_ebook_number($name, $val='') {
 
 // ------------------------
 // List of current file categories
-function smd_ebook_file_cat_list($name, $val='') {
+function smd_ebook_file_cat_list($name, $val='')
+{
     $rs = getTree('root', 'file');
     if ($rs) {
         return treeSelectInput($name, $rs, $val, $name);
@@ -2270,17 +2344,20 @@ function smd_ebook_file_cat_list($name, $val='') {
 
 // ------------------------
 // Multi-select list of current stylesheets
-function smd_ebook_style_list($name, $val='') {
+function smd_ebook_style_list($name, $val='')
+{
     $styles = safe_column('name', 'txp_css', '1=1');
     $sels = do_list($val);
 
     $ulist = array();
     $ulist[] = '<select name="'.$name.'[]" id="'.$name.'" class="list multiple" multiple="multiple" size="6">';
     $ulist[] = '<option value=""></option>';
+
     foreach ($styles as $style) {
         $selected = in_array($style, $sels) ? ' selected="selected"' : '';
         $ulist[] = '<option value="'.$style.'"'.$selected.'>' . txpspecialchars($style) . '</option>';
     }
+
     $ulist[] = '</select>';
 
     return join(n, $ulist);
@@ -2289,31 +2366,38 @@ function smd_ebook_style_list($name, $val='') {
 // ------------------------
 // List of current sections
 // TODO: multiple select?
-function smd_ebook_section_list($name, $val='') {
+function smd_ebook_section_list($name, $val='')
+{
     $secs = safe_column('name', 'txp_section', '1=1');
+
     return selectInput($name, $secs, $val, true, '', $name);
 }
 
 // ------------------------
 // Select list of custom fields
-function smd_ebook_cf_list($name, $val='') {
+function smd_ebook_cf_list($name, $val='')
+{
     $cfs = getCustomFields();
+
     return selectInput($name, $cfs, $val, true, '', $name);
 }
 
 // ------------------------
 // Select list of custom fields with a few extras
-function smd_ebook_fld_list($name, $val='') {
+function smd_ebook_fld_list($name, $val='')
+{
     $cfs = getCustomFields();
     $cfs['Title'] = gTxt('title');
     $cfs['Excerpt_html'] = gTxt('excerpt');
     $cfs['SMD_FIXED'] = gTxt('smd_ebook_fixed');
+
     return selectInput($name, $cfs, $val, true, '', $name);
 }
 
 // ------------------------
 // Select list of custom fields with a few more extras
-function smd_ebook_fld_list_plus($name, $val='') {
+function smd_ebook_fld_list_plus($name, $val='')
+{
     $cfs = getCustomFields();
     $cfs['Title'] = gTxt('title');
     $cfs['Excerpt_html'] = gTxt('excerpt');
@@ -2321,23 +2405,27 @@ function smd_ebook_fld_list_plus($name, $val='') {
     $cfs['Category2'] = gTxt('category2');
     $cfs['Section'] = gTxt('section');
     $cfs['SMD_FIXED'] = gTxt('smd_ebook_fixed');
+
     return selectInput($name, $cfs, $val, true, '', $name);
 }
 
 // ------------------------
 // List of custom fields
-function smd_ebook_fld_list_author($name, $val='') {
+function smd_ebook_fld_list_author($name, $val='')
+{
     $cfs = getCustomFields();
     $cfs['Title'] = gTxt('title');
     $cfs['Excerpt_html'] = gTxt('excerpt');
     $cfs['AuthorID'] = gTxt('author');
     $cfs['SMD_FIXED'] = gTxt('smd_ebook_fixed');
+
     return selectInput($name, $cfs, $val, true, '', $name);
 }
 
 // ------------------------
 // Multi-select list of privilege levels
-function smd_ebook_priv_list($name, $val='') {
+function smd_ebook_priv_list($name, $val='')
+{
     $grps = get_groups();
     unset($grps['0']); // Remove 'none'
     unset($grps['1']); // Remove publishers -- they get access to everything already
@@ -2346,10 +2434,12 @@ function smd_ebook_priv_list($name, $val='') {
 
     $ulist = array();
     $ulist[] = '<select name="'.$name.'[]" id="'.$name.'" class="list multiple" multiple="multiple" size="6">';
+
     foreach ($grps as $lvl => $grp) {
         $selected = in_array($lvl, $sels) ? ' selected="selected"' : '';
         $ulist[] = '<option value="'.$lvl.'"'.$selected.'>' . txpspecialchars($grp) . '</option>';
     }
+
     $ulist[] = '</select>';
 
     return join(n, $ulist);
@@ -2357,10 +2447,12 @@ function smd_ebook_priv_list($name, $val='') {
 
 // -------------------------------------------------------------
 // Frankenteined from http://www.php.net/manual/en/function.uniqid.php#88400
-function smd_ebook_uid() {
+function smd_ebook_uid()
+{
     $pr_bits = '';
 
     $fp = @fopen('/dev/urandom', 'rb');
+
     if ($fp !== false) {
         $pr_bits .= @fread($fp, 16);
         fclose($fp);
@@ -2393,7 +2485,8 @@ function smd_ebook_uid() {
  *
  * @return bool
  */
-function smd_ebook_is_isbn($isbn) {
+function smd_ebook_is_isbn($isbn)
+{
     // Remove spaces/dashes
     $isbn = preg_replace('/[\s\-]/', '', $isbn);
 
@@ -2440,7 +2533,8 @@ function smd_ebook_is_isbn($isbn) {
 
 // -------------------------------------------------------------
 // Modified from http://stackoverflow.com/questions/3938120/check-if-exec-is-disabled
-function smd_ebook_kindlegen_available() {
+function smd_ebook_kindlegen_available()
+{
     global $smd_ebook_prefs;
 
     static $available;
@@ -2468,9 +2562,11 @@ function smd_ebook_kindlegen_available() {
 }
 
 // -------------------------------------------------------------
-function smd_ebook_save_pane_state() {
+function smd_ebook_save_pane_state()
+{
     $panes = array('smd_ebook_usrset', 'smd_ebook_pubset', 'smd_ebook_settings');
     $pane = gps('pane');
+
     if (in_array($pane, $panes))
     {
         set_pref("pane_{$pane}_visible", (gps('visible') === 'true' ? '1' : '0'), 'smd_ebook', PREF_HIDDEN, 'yesnoradio', 0, PREF_PRIVATE);
@@ -2482,7 +2578,8 @@ function smd_ebook_save_pane_state() {
 
 // ------------------------
 // Set up the global prefs for the plugin
-function smd_ebook_get_prefs() {
+function smd_ebook_get_prefs()
+{
     global $smd_ebook_prefs;
 
     $sitepath = get_pref('path_to_site');
