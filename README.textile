@@ -1,70 +1,75 @@
 h1. smd_ebook
 
-There are a few ways to create E-books suitable for e-readers like Kindle / Kobo / Nook / etc:
+There are a few ways to create e-books suitable for e-readers like Kindle / Kobo / Nook / etc:
 
-* "Install Calibre":http://calibre-ebook.com/ and use the software to guide you towards creating your book
-* Install a plugin for Adobe InDesign and let it help you create the book from your DTP files
-* Download the "command-line Kindlegen":http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000234621 tool, create all the input files manually and hope
-* Upload the Kindlegen program to your Textpattern web host and use this plugin to convert one or more articles into an E-book
+* "Install Calibre":http://calibre-ebook.com/ and use the software to guide you towards creating your book.
+* Install a plugin for Adobe InDesign and let it help you create the book from your DTP files.
+* Download the "command-line Kindlegen":http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000234621 tool, create all the input files manually and hope.
+* Use this plugin to convert one or more articles into an e-book.
 
 The last one is of course the focus of this plugin! Features:
 
-* Choose articles to be converted  --  order of articles in final book is alphabetical by URL title
-* Standard Textile formatting governs the (multi-level) table of contents and document entry points (plugin will automatically create ToC entry points if you choose)
-* Set cover art as article image
-* Enter Description, Publisher, Genre, Author notes and Price in plugin or use article fields (useful for publisher sites to allow authors to publish their own content)
-* Tweak files if necessary before final E-book generation
-* Download files for distribution via third party sites, or send them to Txp's Files tab ready for direct download by others
+* Choose articles to be converted -- order of articles in final book is alphabetical by URL title.
+* Standard Textile formatting governs the (multi-level) table of contents and document entry points (plugin will automatically create ToC entry points if you choose).
+* Set cover art as article image.
+* Enter Description, Publisher, Genre, Author notes, ISBN and Price in plugin or use article fields (useful for publisher sites to allow authors to publish their own content).
+* Tweak and preview files if necessary before final e-book generation.
+* Download files for distribution via third party sites, or send them to Txp's Files tab ready for direct download by others.
+* .mobi (for Kindle) or .ePub v3 (for everything else) books can be created.
 
 h2. Installation / uninstallation
 
-Requires Textpattern 4.5.0+ and PHP5+
+p(important). Requires Textpattern 4.5.0+. "smd_crunchers":http://stefdawson.com/smd_crunchers required for ePub generation.
 
 Download the plugin from either "textpattern.org":http://textpattern.org/plugins/NNNN/smd_ebook, or the "software page":http://stefdawson.com/sw, paste the code into the Txp _Admin->Plugins_ pane, install and enable the plugin. Visit the "forum thread":http://forum.textpattern.com/viewtopic.php?id=YYYYY for more info or to report on the success or otherwise of the plugin.
 
 To remove the plugin, simply delete it from the _Admin->Plugins_ pane.
 
-h2. Setting up
+h2. Setting up for Kindle (mobi)
 
-# Obtain the "kindlegen program":http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000234621 that is compatible with your web host  --  most likely the Linux version. While you're there you might as well grab the (huge!) Kindle Previewer too as it's very handy to test files made with this plugin.
-# Upload kindlegen via your FTP program *as binary* to a location of your choosing on your web host; preferably outside document root so it can't be run by other people. Double check it is uploaded as binary  --  some FTP software (e.g. FileZilla) is set to auto-negotiate the file type and often gets it wrong. If the plugin doesn't work, this is the most likely source of failure.
-# Visit the _Content->E-books_ tab with a Publisher level account and hit the _Settings_ button. Configure the _Path to kindlegen executable_ to reflect the location of your uploaded kindlegen file. Set up any other relevant settings while you are here and save them.
-# *After saving the settings* you can click the _Test kindlegen program_ link to check that the program is uploaded correctly and the plugin can find it. If everything's OK, you will be told so in a text box that appears below the link. If the kindlegen file produces errors or cannot be found, the error messages will be shown instead.
+# Obtain the "kindlegen program":http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000234621 that is compatible with your web host -- most likely the Linux version. While you're there you might as well grab the (huge!) Kindle Previewer too as it's very handy to test files made with this plugin.
+# Upload kindlegen via your FTP program *as binary* to a location of your choosing on your web host; preferably outside document root so it can't be run by other people. Double check it is uploaded as binary -- some FTP software (e.g. FileZilla) is set to auto-negotiate the file type and often gets it wrong. If the plugin doesn't work, this is the most likely source of failure.
+# Visit the _Content->E-books_ panel with a Publisher level account and hit the _Settings_ button. Configure the _Path to kindlegen executable_ to reflect the location of your uploaded kindlegen file. Set up any other relevant settings while you are here and save them.
+# *After saving the settings* you can click the _Test kindlegen program_ link to check that the program is uploaded correctly and the plugin can find it. If everything is OK, you will be told so in a text box that appears below the link. If the kindlegen file produces errors or cannot be found, the error messages will be shown instead.
+
+h2. Setting up for ePub
+
+* Download "smd_crunchers":http://stefdawson.com/smd_crunchers.
+* Install and activate the plugin.
 
 h2. Writing content suitable for E-readers
 
 While the technology and tools are improving, there are some guidelines and things to be aware of when creating content in Textpattern that will translate well into a good e-reader experience:
 
-* Use headings to create chapters or logical breaks in your prose. You can create many articles if you wish  --  perhaps one article per chapter  --  and create a single file from them, or create it all in one article.
-* Supply cover art. This must be a GIF or JPG image of dimensions 500 (w) x 600 (h) pixels. Assign the ID of the cover image uploaded to Textpattern in the _Article Image_ field of the first chapter.
-* Create a stylesheet to lay out your table of contents or alter facets of your book. Formatting is often hit and miss because the e-readers use their own internal styles, but some things can be influenced with a stylesheet. Tinker with it to see what effects you can create.
-* "Inline images":#smd_ebook_images cannot flow around text  --  they always appear block style.
-* Add author notes to a field in your first article  --  such notes appear after the cover image and before the ToC. Copyright info and acknowledgements are useful here. See the setting _Get author notes from field_.
+* Use headings to create chapters or logical breaks in your prose. You can create many articles if you wish -- perhaps one article per chapter -- and create a single file from them, or create the entire book in one article.
+* Supply cover art. This must be a GIF or JPG image of dimensions 600 (w) x 800 (h) pixels. Assign the ID of the cover image uploaded to Textpattern in the _Article Image_ field of the first chapter.
+* Create stylesheet(s) to lay out your table of contents or alter facets of your book. Formatting is often hit and miss because e-readers use their own internal styles, but some things can be influenced with a stylesheet. Tinker with it to see what effects you can create.
+* "Inline images":#smd_ebook_images cannot flow around text in early devices -- they always appear block style.
+* Add author notes to a field in your first article -- such notes appear after the cover image and before the ToC. Copyright info and acknowledgements are useful here. See the setting _Get author notes from field_.
 
 h3. Formatting for Table of Contents (ToC)
 
-The concept of a ToC maps nicely in Textile / HTML to the @<h1>@  -  @<h6>@ tags, although you do not have to stick to that convention. Any anchor with an HTML ID will be converted into a ToC entry point by the plugin.
+The concept of a ToC maps nicely in Textile / HTML to the @<h1>@ - @<h6>@ tags, although you do not have to stick to that convention. Any anchor with an HTML ID will be converted into a ToC entry point by the plugin.
 
 There are two primary methods for creating a table of contents:
 
-# Use @h1.@ to @h6.@ Textile tags and set the plugin to automatically create ToC entries from headings
-# Manually add @id@ atributes to some/all headings (in Textile: @h2(#some-id). My Great Heading@) or other anchors
+# Use @h1.@ to @h6.@ Textile tags and set the plugin to automatically create ToC entries from headings.
+# Manually add @id@ attributes to some/all headings (in Textile: @h2(#some-id). My Great Heading@) or other anchors.
 
-Any anchors you miss off will be automatically assigned by the plugin if you have elected to permit this behaviour.
+Any anchors you miss off will be automatically assigned by the plugin if you have elected to permit this behaviour (see the plugin settings).
 
 Use hyphens in the ID to create nested menu structures: each hyphen creates one 'level', e.g.:
 
-bc(block). h2(#l1). Level 1 heading
+bc. h2(#l1). Level 1 heading
 h2(#some_heading). Another level 1 heading
 h2(#l1-subbie). A sub-heading beneath the previous heading
-h2(#some-name). Another subheading beneath the previous heading
-
+h2(#some-name). Another sub-heading beneath @#some_heading@
 
 Note that the names don't have to have the same prefix or follow any pattern (though it makes sense to do so for sanity's sake!), nor does the heading level bear any influence. The number of hyphens overrides the heading level to govern the nesting levels. If you don't like this feature, use underscores to separate words in your IDs, or leave the plugin to create ToC entry points for you.
 
 h3(#smd_ebook_pbr). Page breaks
 
-Page breaks normally occur in E-books before chapter headings. To insert page breaks into the document you have three options:
+Page breaks normally occur in e-books before chapter headings. To insert page breaks into the document you have three options:
 
 # Add the special tag @~~~~~@ before each chapter heading (you will most likely need a blank line above and below it: the plugin will eat the extra paragraph marks that Textile inserts).
 # Modify the heading style to include a class name in your nominated kindle stylesheet that has the rule: @page-break-before: always@.
@@ -83,7 +88,6 @@ bc(block). <txp:images name="my-pic.jpg">
      title="<txp:image_info />" />
 </txp:images>
 
-
 For convenience you could set this content up as an smd_macro.
 
 The plugin's [Preview] window will detect the fact your images are using paths and attempt to swap them for URLs on the fly so you can see them in the preview. It may not work on Windows hosts or if you have your images in a separate domain.
@@ -92,123 +96,135 @@ h2. Plugin settings
 
 h3. Configuration
 
-<dl>
-<dt>Unique ID:</dt>
-<dd>An optional unique reference ID for all projects created from the plugin. Useful for publishers to 'tag' all their own books with a code.</dd>
-<dt>Page break character sequence</dt>
-<dd>Use this string in your article text to denote where a page break should occur. You may "use CSS":#smd_ebook_pbr if you prefer.</dd>
-<dd>Default: @~~~~~@ (five tilde characters)</dd>
-<dt>Render ToC as</dt>
-<dd>Choose between creating the Table of Contents markup as:</dd>
-<dd>*Standard* (@<ul>@)</dd>
-<dd>*Numeric* (@<ol>@)</dd>
-</dl>
-
-Default: Standard
-
-ToC CSS class name
-
-The CSS class to apply to the table of contents.
-
-Default: @smd_ebook_toc@
-
-List articles from section
-
-Limit the articles in the select list to the ones in the nominated section. Otherwise, all sections are considered.
-
-Stylesheet to include with the book
-
-Choose one Textpattern stylesheet that will be inserted into each article in the book to govern formatting.
-
-Apply Textile to
-
-Choose whether to pass the checked content through Textile. If the field you are choosing to represent the content has already been Textiled, it's probably not a good idea to do it a second time.
-
-Character set of document
-
-The character set to use in the final document. Useful values are usually @utf-8@ or @iso-8859-1@.
-
-Default: @utf-8@
-
-Path to kindlegen executable
-
-The full system file path to the kindlegen program that you uploaded to your web host (*as a binary file*!)
-
-It is preferable to make this a non-web-accessible location.
+; *Page break character sequence*
+: Use this string in your article text to denote where a page break should occur. You may "use CSS":#smd_ebook_pbr if you prefer.
+: Default: @~~~~~@ (five tilde characters)
+; *Render ToC as*
+: Choose between creating the Table of Contents markup as:
+:: Standard (@<ul>@)
+:: Numeric (@<ol>@)
+: Default: Standard
+; *ToC CSS class name*
+: The CSS class to apply to the table of contents.
+: Default: @smd_ebook_toc@
+; *List articles from section*
+: Limit the articles in the select list to the ones in the nominated section. Otherwise, all sections are considered.
+; *Stylesheets to include with the book*
+: Choose Textpattern stylesheets that will be inserted into each article in the book to govern formatting.
+; *Apply Textile to*
+: Choose whether to pass the checked content through Textile. If the field you are choosing to represent the content has already been Textiled, it's probably not a good idea to do it a second time.
+; *Character set of document*
+: The character set to use in the final document. Useful values are usually @utf-8@ or @iso-8859-1@.
+: Default: @utf-8@
+; *Path to kindlegen executable*
+: The full system file path to the kindlegen program that you uploaded to your web host (*as a binary file*!)
+: It is preferable to make this a non-web-accessible location.
 
 h3. Publishing
 
-<dl>
-<dt>Automatically create ToC anchors on headings</dt>
-<dd>Set to @Yes@ to automatically create anchors from all heading tags in your article(s). If you have already put some in the dcument, the plugin will only auto-generate ones you have missed.</dd>
-<dd>Default: Yes</dd>
-<dt>Get book title from field</dt>
-<dd>Nominate an article field to hold the book's title. Leave this item empty to force the title to be entered at book compilation time, or choose _Static text_ and enter a title that will be applied to all created books.</dd>
-<dd>Default: article's @Title@ field</dd>
-<dt>Get chapter titles from field</dt>
-<dd>Nominate an article field to hold the chapter titles. Leave this item empty to set chapters manually in the body text, or choose _Static text_ and enter a title that will be applied to every chapter.</dd>
-<dd>Any chosen item will be wrapped with HTML heading tags of the level given in the _Chapter heading level_ setting.</dd>
-<dt>Get author from field</dt>
-<dd>Nominate an article field to hold the author of the work. Leave this item empty to allow the author to be entered at book compilation time, or choose _Static text_ and enter an author that will be applied to all created books.</dd>
-<dd>The @Author@ entry in the list will read the Author from the first article in the book.</dd>
-<dd>Default: @Author@</dd>
-<dt>Get description from field</dt>
-<dd>Nominate an article field to hold the book's description. Leave this item empty to allow the description to be entered at book compilation time, or choose _Static text_ and enter a description that will be applied to all created books.</dd>
-<dd>This field will be Textiled if you have checked it in the _Apply Textile to_ setting.</dd>
-<dt>Get author notes from field</dt>
-<dd>Nominate an article field to hold the author notes (acknowledgements, copyright, etc). Leave this item empty to allow the notes to be entered at book compilation time, or choose _Static text_ and enter content that will be applied to all created books.</dd>
-<dd>This field will be Textiled if you have checked it in the _Apply Textile to_ setting.</dd>
-<dt>Get subject (genre) from field</dt>
-<dd>Nominate an article field to determine the subject or genre of the article. Leave this item empty to allow the genre to be entered at book compilation time, or choose _Static text_ and enter content that will be applied to all created books.</dd>
-<dt>Get publisher from field</dt>
-<dd>Nominate an article field to set the publisher of the article. Leave this item empty to allow the info to be entered at book compilation time, or choose _Static text_ and enter a publisher name that will be applied to all created books.</dd>
-<dt>Get SRP (price) from field</dt>
-<dd>Nominate an article field to set the download price of the article. Leave this item empty to allow the info to be entered at book compilation time, or choose _Static text_ ten enter a price and optional three-letter currency code (e.g. USD, GBP, EUR), separated by a pipe symbol, that will be applied to all created books. If the currency is not supplied it will be taken from the setting _Default three-letter currency code_.</dd>
-<dt>Default three-letter currency code</dt>
-<dd>The three-letter "currency code":http://www.xe.com/iso4217.php of the default currency to use for the book's price.</dd>
-<dd>Default: @EUR@</dd>
-<dt>Chapter heading level</dt>
-<dd>If your chapter headings are being read from an article field, they will automatically be wrapped with HTML @<hN>...</hN>@ tags, where @N@ is the value in this setting.</dd>
-<dd>Default: 2</dd>
-<dt>Store files in category</dt>
-<dd>If you elect to store your completed E-books in Textpattern's Files tab, this is the category to which they'll be assigned.</dd>
-</dl>
+; *Automatically create ToC anchors on headings*
+: Set to @Yes@ to automatically create anchors from all heading tags in your article(s). If you have already put some in the document, the plugin will only auto-generate ones you have missed.
+: Default: Yes
+; *Get book title from field*
+: Nominate an article field to hold the book's title. Leave this item empty to force the title to be entered at book compilation time, or choose _Static text_ and enter a title that will be applied to all created books.
+: Default: article's @Title@ field
+; *Get chapter titles from field*
+: Nominate an article field to hold the chapter titles. Leave this item empty to set chapters manually in the body text, or choose _Static text_ and enter a title that will be applied to every chapter.
+: Any chosen item will be wrapped with HTML heading tags of the level given in the _Chapter heading level_ setting.
+; *Get author from field*
+: Nominate an article field to hold the author of the work. Leave this item empty to allow the author to be entered at book compilation time, or choose _Static text_ and enter an author that will be applied to all created books.
+: The @Author@ entry in the list will read the Author from the first article in the book.
+: Default: @Author@
+; *Get description from field*
+: Nominate an article field to hold the book's description. Leave this item empty to allow the description to be entered at book compilation time, or choose _Static text_ and enter a description that will be applied to all created books.
+: This field will be Textiled if you have checked it in the _Apply Textile to_ setting.
+; *Get author notes from field*
+: Nominate an article field to hold the author notes (acknowledgements, copyright, etc). Leave this item empty to allow the notes to be entered at book compilation time, or choose _Static text_ and enter content that will be applied to all created books.
+: This field will be Textiled if you have checked it in the _Apply Textile to_ setting.
+; *Get subject (genre) from field*
+: Nominate an article field to determine the subject or genre of the article. Leave this item empty to allow the genre to be entered at book compilation time, or choose _Static text_ and enter content that will be applied to all created books.
+; *Get publisher from field*
+: Nominate an article field to set the publisher of the article. Leave this item empty to allow the info to be entered at book compilation time, or choose _Static text_ and enter a publisher name that will be applied to all created books.
+; *Get SRP (price) from field*
+: Nominate an article field to set the download price of the article. Leave this item empty to allow the info to be entered at book compilation time, or choose _Static text_ then enter a price and optional three-letter currency code (e.g. USD, GBP, EUR), separated by a pipe symbol, that will be applied to all created books. If the currency is not supplied it will be taken from the setting _Default three-letter currency code_.
+; *Default three-letter currency code*
+: The three-letter "currency code":http://www.xe.com/iso4217.php of the default currency to use for the book's price.
+: Default: @EUR@
+; *Get unique ID from field*
+: Nominate an article field to set a unique reference identifier for the book. Leave this item empty to allow the info to be entered at book compilation time, or choose _Static text_ and enter a value that will be applied to all created books (although this is not recommended for creating multiple books as each "UUID":http://en.wikipedia.org/wiki/Universally_unique_identifier code *must* be unique). You may use this field to store the e-book's ISBN. The plugin will recognise these and output the appropriate markup.
+; *Guide tags defined in field*:
+: To help people jump between structural components of e-books, you can 'tag' (or label / reference / whatever you want to call it) sections of the book as containing certain types of content. For example, the ToC, an acknowledgements page, glossary, index, bibliography, and so on. If you would like to take advantage of this, specify a custom field here that may contain comma-separated identifiers for the plugin to treat as Guide tags. It works well if you reuse the same custom field as __Get unique ID from field__. The following are valid identifiers to put in this field:
+:: *acknowledgments* (note: spelling)
+:: *appendix*
+:: *afterword*
+:: *bibliography*
+:: *colophon*
+:: *conclusion*
+:: *contributors*
+:: *copyright-page*
+:: *dedication*
+:: *epigraph*
+:: *epilogue*
+:: *errata*
+:: *foreword*
+:: *glossary*
+:: *imprint*
+:: *index*
+:: *introduction*
+:: *loi* (list of illustrations)
+:: *lot* (list of tables)
+:: *other-credits*
+:: *preamble*
+:: *preface*
+:: *prologue*
+:: *start-page* (not normally needed as the plugin automatically assigns it)
+:: *titlepage*
+:: *toc* (can be used to override the auto-generated table of contents with content of your choosing)
+: If you need to reference an anchor in your content, add it after a @#@ symbol like this: @bibliography#bibli@
+: If you wish to customise the item's title you may do so by adding a pipe (|) symbol after the item and typing your own title (e.g. @foreword|Foreword by Sam Hotshot@). If you don't add your own title, the plugin uses its internal Textpack.
+: You can list as many identifiers as you like and freely mix @#@ and @|@ characters to build up navigable jump-to points within your e-book.
+; *Chapter heading level*
+: If your chapter headings are being read from an article field, they will automatically be wrapped with HTML @<hN>...</hN>@ tags, where @N@ is the value in this setting.
+: Default: 2
+; *Store files in category*
+: If you elect to store your completed e-books in Textpattern's Files tab, this is the category to which they'll be assigned.
 
 h3. Rights
 
-<dl>
-<dt>Groups that can publish</dt>
-<dd>Select the user groups that are permitted to publish e-books. Users in these groups will see a _Content->E-books_ tab but will not be permitted to alter the Settings.</dd>
-<dt>Groups that can edit .opf</dt>
-<dd>The .opf is the master file that governs e-book creation. Publisher account holders can always edit this file but if you have preset some of the content using the _Static text_ publishing options, being able to alter the .opf would allow someone to change the presets. For this reason you can use this setting to govern which user groups you trust to edit the .opf and potentially override the settings.</dd>
-</dl>
+; *Groups that can publish*
+: Select the user groups that are permitted to publish e-books. Users in these groups will see a _Content->E-books_ panel but will not be permitted to alter the Settings.
+; *Groups that can edit .opf*
+: The .opf is the master file that governs e-book creation. Publisher account holders can always edit this file but if you have preset some of the content using the _Static text_ publishing options, being able to alter the .opf would allow someone to change the presets. For this reason you can use this setting to govern which user groups you trust to edit the .opf and potentially override the settings.
 
 h2. Creating a book
 
 The creation process takes place in two stages, although the plugin will have a stab at creating everything in one step if it can.
 
-To kick things off, visit the _Content->E-books_ tab. Choose one or more articles from the first select list to create into a book. When choosing multiple files, the order they will appear in the book is the same order as they are in this list. It is goverened by URL title so if you want things to appear in a different order, alter the url-only title of your articles, e.g.:
+To kick things off, visit the _Content->E-books_ panel. Choose one or more articles from the first select list to create into a book. When choosing multiple files, the order they will appear in the book is the same order as they are in this list. It is governed by URL title so if you want things to appear in a different order, alter the url-only title of your articles, e.g.:
 
 * chapter01-the-bell-tolls
 * chapter02-trousers-on-fire
 * chapter03-false-alarm
- ...
+...
 
-You may optionally fill in any of the remaining content fields that are presented. Only Title is mandatory. Some may be prefilled by content from the indicated fields in your selected article(s). Note that such information is *only taken from the first article in which that field has data*. Thus when compiling multiple articles into a single book, it's a good idea to put all such meta data  --  including article image (which is used for the cover artwork)  --  in the first chapter. Once a piece of info is set, it is not altered in subsequent files that make up the same book, even if data is present in the nominated fields.
+You may optionally fill in any of the remaining content fields that are presented. Only Title is mandatory. Some may already be filled with content from the indicated fields in your selected article(s). Note that such information is *only taken from the first article in which that field has data*. Thus when compiling multiple articles into a single book, it's a good idea to put all such meta data -- including article image (which is used for the cover artwork) -- in the first chapter. Once a piece of info is set, it is not altered in subsequent files that make up the same book, even if data is present in the nominated fields.
+
+You may specify an output filename for your final masterpiece if you wish. If you do not, the filename will be that of the first chapter.
 
 A note about the Price field: you specify up to two pieces of info in this field, separated by a pipe symbol (@|@). First the price itself and then the three-letter currency code (e.g. GBP, EUR, USD, AUD, etc). If the currency code is not supplied, the setting _Default three-letter currency code_ will be used.
 
-After clicking _Create_, the plugin will collate all the selected articles and meta data and try to produce a complete e-book (.mobi file). The success or otherwise of the process is shown in the _Build report_ box. Scroll through this info to find any errors. You may need to go back to your source documents to fix them. Alternatively you may be able to fix the problems by manually editing the various files that make up the project.
+After clicking _Create_, the plugin will collate all the selected articles and meta data and try to produce a complete e-book. If you chose Kindle, this will be a .mobi file; for ePub format, it tries to create a zip file if the "smd_crunchers":http://stefdawson.com/smd_crunchers plugin is installed. The success or otherwise of the process is shown in the _Build report_ box. Scroll through this info to find any errors. You may need to go back to your source documents to fix them. Alternatively you may be able to fix the problems by manually editing the various files that make up the project.
 
 All files are listed on the left hand side of the screen. Although each project is different, the various components that may be present are:
 
 * One .html file for each article you selected.
+* Any images you have used in the book. Reveal them by clicking the [Images] link below the chapter in which they are used.
 * An HTML Table of Contents with the filename of the first article in the project plus @_toc.html@.
 * An author notes page (filename of first article plus @_notes.html@).
 * A .ncx file which is a special (XML) waypoint and navigation aid that allows e-readers to show chapter points in a timeline and permit jumping to various parts of the document (cover, author notes, chapters, etc) from the context menu key on the reader.
-* A .opf file (which may not be displayed depending on the rights assigned to your user account) which is the master (XML) record that ties all the other files together and is fed to the kindlegen program to create the final .mobi file.
+* A .opf file (which may not be displayed depending on the rights assigned to your user account) which is the master (XML) record that ties all the other files together to create the e-book experience.
 
-You can click any file name to open it for editing in the adjacent box, make changes to the markup and _Save_ the alterations. Do this as often as you like and, when completed, hit the _generate_ button to tell the plugin to try to create the .mobi file again. If you wish to preview any of the HTML files (for example, to check your stylesheet is applying appropriate rules) click the @[Preview]@ link after the file's title. Click the 'X' in the top-right corner of the preview window, or hit the ESCape key to dismiss the preview.
+You can click [Edit] under any file name to open it for editing in the adjacent box, make changes to the markup and _Save_ the alterations. Do this as often as you like and, when completed, hit the _(Re)generate_ button to tell the plugin to try to create the book again. If you wish to preview any of the HTML files (for example, to check your stylesheet is applying appropriate rules) click the @[View]@ or [View ToC] link beneath the file's title. Click the 'X' in the top-right corner of the preview window, or hit the ESCape key to dismiss the preview. Images can also be previewed by clicking their filename.
 
 If you wish to create an article with a specific language string you can do one of two things:
 
@@ -217,19 +233,26 @@ If you wish to create an article with a specific language string you can do one 
 
 Upon successful completion of the process you can choose whether to:
 
-* Click the _Store file_ button to copy the complete E-book file to Textpattern's Files tab. If the file does not exist, it will be created. If it exists, it will be updated with the new details (title and description as you entered them in the input boxes when the book was created, and the category as set in the plugin settings).
-* Click the _Download_ button to download a copy of the complete E-book to your computer, whereby it's a good idea to test it in Kindle Previewer or transfer it to your real e-reader and check the navigation and formatting are to your satisfaction.
+* Click the _Store file_ button to copy the complete e-book file to Textpattern's Files tab. If the file does not exist, it will be created. If it exists, it will be updated with the new details (title and description as you entered them in the input boxes when the book was created, and the category as set in the plugin settings).
+* Click the _Download_ button to download a copy of the complete e-book to your computer, whereby it's a good idea to test it in Kindle Previewer or Calibre, or transfer it to your real e-reader and check the navigation and formatting are to your satisfaction.
+
+If you download your content, it is strongly suggested that you try the e-book on as many devices as you can to check for formatting errors. Amazon have the Kindle Previewer, and Calibre has a Viewer tool. Other software may exist too. Note that since kindlegen handles formatting and conversion, any generation warnings or errors are displayed in the report. But for ePub files, only broad checks are made as the package is built. It may be advantageous, therefore, to run them through a validator such as "ePubCheck":http://code.google.com/p/epubcheck/ or an "online checker":http://validator.idpf.org/.
 
 h2. Tidying up
 
-The plugin uses Textpattern's @tmp@ directory to store its files as it creates them. Since the editorial process may involve editing or tweaking them and so forth, the files are left in situ even after the .mobil file has been created.
+The plugin uses Textpattern's @tmp@ directory to store its files as it creates them. Since the editorial process may involve editing or tweaking them and so forth, the files are left in situ even after the e-book has been created.
 
-It is up to the site admin to keep things tidy and, to this end, there's a helpful extra panel under the e-books tab called 'Tidy up'. Click that button to be shown a list of possible e-book-ish files in the tmp directory. In addition to the files that are editable after creation of an e-book, one other special file  --  a .smd file  --  is something the plugin uses to keep track of which files are in each project. Once a .mobil file has been created, this file is also no longer of any use.
+It is up to the site admin to keep things tidy and, to this end, there's a helpful extra panel under the e-books panel called 'Tidy up'. Click that button to be shown a list of possible e-book-ish files in the tmp directory. In addition to the files that are editable after creation of an e-book, one other special file -- a .smd file -- is something the plugin uses to keep track of which files are in each project. Once an e-book has been created, this file is also no longer of any use.
 
 Select the files you want to delete and hit the _Delete_ button. No warning is given: they are deleted immediately.
 
 h2. Author and credits
 
-Written by "Stef Dawson":http://stefdawson.com/contact. For other software by me, or to make a donation, see the "software page":http://stefdawson.com/sw.
+Plugin written by "Stef Dawson":http://stefdawson.com/contact. For other software by me, or to make a donation, see the "software page":http://stefdawson.com/sw.
 
 While the code to glue all the various parts together is mine, the various websites, blogs and forums I had to trawl to gather the info are many. Thank you to anybody who has posted Kindle / ePub / .mobi / e-reader tricks, tips and guides. Without you I could not have completed this plugin because official documentation on the kindlegen program is surprisingly lacking. Thanks also to Amazon techs for writing the kindlegen program.
+
+h2. Changelog
+
+* 19 Mar 2012 | 0.10 | Beta release
+* 13 Jun 2013 | 0.20 | For textpattern 4.5.x; added ePub support; allowed images to be previewed
