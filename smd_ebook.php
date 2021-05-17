@@ -2099,18 +2099,22 @@ function smd_ebook_buttons($curr='mgr')
 
 // ------------------------
 // Tidy up the temp dir
-function smd_ebook_tidy($msg='')
+function smd_ebook_tidy($msg = '')
 {
     global $smd_ebook_event;
 
     require_privs('plugin_prefs.'.$smd_ebook_event);
+    $tmpdir = get_pref('tempdir');
 
     if (ps('smd_ebook_cleanup')) {
         $to_delete = ps('smd_ebook_files');
 
-        foreach($to_delete as $del) {
-            $path = realpath(get_pref('tempdir') . DS . $del);
-            unlink($path);
+        foreach ($to_delete as $del) {
+            $path = realpath($tmpdir . DS . $del);
+
+            if (is_readable($path)) {
+                unlink($path);
+            }
         }
 
         $msg = gTxt('smd_ebook_deleted');
