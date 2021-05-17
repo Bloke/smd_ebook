@@ -231,18 +231,18 @@ function smd_ebook_get_style_rules()
 .smd_selected { border-top:solid #444; border-bottom:solid #444; }
 .smd_important { color:red; }
 .smd_inline { display:inline; }
-#smd_ebook_preview { display:none; position:absolute; top:1em; left:2.5em; margin:0 auto; text-align:left; border:2px ridge #999; background:#ececec; max-width:680px; min-width:300px; box-shadow: 8px 8px 15px #b9b9b9; }
+#smd_ebook_preview { display:none; position:absolute; top:1em; left:1em; margin:0 auto; text-align:left; border:2px ridge #999; background:#ececec; max-width:680px; min-width:300px; box-shadow: 8px 8px 15px #b9b9b9; }
 #smd_ebook_preview_close { float:right; cursor:pointer; margin-left:1em; }
 #smd_ebook_preview_content { padding:1em; }
 #smd_ebook_preview_titlebar { padding:5px; border-bottom:1px solid black; font-size:120%; background:#ccc; }
-#smd_ebook_form { margin:0 auto; width:80%; }
+#smd_ebook_form { margin:0 auto;}
 #smd_ebook_form label, #smd_ebook_create { display:block; }
 #smd_ebook_prefs input[type="text"] { width:250px; }
-.smd_ebook_manager { position:relative; margin:0 auto; width:80%; }
+.smd_ebook_manager { position:relative; margin:0 auto; }
 .smd_ebook_report textarea { width:80%; }
 #smd_ebook_editor { display:block; width:70%; }
 .smd_ebook_file_group { margin:0 0 0.7em; }
-.smd_ebook_files { float:left; width:30%; text-align:left; }
+.smd_ebook_files { float:left; width:30%; text-align:left; overflow-x:hidden;}
 .smd_ebook_files ul { display:none; }
 .smd_ebook_pub_options { text-align:right; }
 .smd_ebook_entity { float:left; margin:1em; }
@@ -250,6 +250,9 @@ function smd_ebook_get_style_rules()
 #smd_ebook_type_opts { margin:0.8em 0.5em; }
 #smd_ebook_type_opts label { display:inline; }
 .smd_ebook_file { line-height:1.5; }
+@media (min-width:47em) {
+   #smd_ebook_preview { left:2.5em; }
+}
 ',
     );
 
@@ -380,13 +383,13 @@ function smd_ebook_ui($msg = '', $listfile = '', $report = '', $retval = '', $eb
             $data['content'] = ($data['value'] === 'SMD_FIXED') ? get_pref('smd_ebook_fld_'.$field.'_fixed', '') : '';
             $data['required'] = isset($data['required']) ? $data['required'] : false;
             $data['hide_empty'] = isset($data['hide_empty']) ? $data['hide_empty'] : false;
-            ${'ip_'.$field} = '<div class="smd_ebook_entity">' . ( ($data['content'] || ($data['name'] === '' && $data['hide_empty']))
+            ${'ip_'.$field} = '<div class="smd_ebook_entity">' . (($data['content'] || ($data['name'] === '' && $data['hide_empty']))
                 ? hInput('smd_ebook_fld_'.$field, txpspecialchars($data['content']))
                 : '<label for="smd_ebook_fld_'.$field.'">' . gTxt('smd_ebook_lbl_'.$field) . '</label>'
-                    . ( ($data['column'])
+                    . (($data['column'])
                         ? hInput('smd_ebook_fld_'.$field, 'SMD_FLD_'.$data['column'])
                             . '<span class="smd_preselected">' . gTxt('smd_ebook_from').' '.str_replace('SMD_FLD_', '', $data['name']) . '</span>'
-                        : ( ($data['html'] === 'textarea')
+                        : (($data['html'] === 'textarea')
                             ? text_area('smd_ebook_fld_'.$field, '150', '250', '', 'smd_ebook_fld_'.$field)
                             : fInput('text', 'smd_ebook_fld_'.$field, '', '', '', '', '', '', 'smd_ebook_fld_'.$field, '', $data['required'])
                         )
@@ -695,7 +698,7 @@ EOJS;
                 }
 
                 if ($ext === 'html') {
-                    $content_view = '[<a href="#" class="smd_ebook_view">'.gTxt((( (strpos($file, '_toc.html') !== false) || (strpos($file, '_end.html') !== false)) ? 'smd_ebook_lbl_view_toc' : 'smd_ebook_lbl_view')).'</a>]';
+                    $content_view = '[<a href="#" class="smd_ebook_view">'.gTxt((((strpos($file, '_toc.html') !== false) || (strpos($file, '_end.html') !== false)) ? 'smd_ebook_lbl_view_toc' : 'smd_ebook_lbl_view')).'</a>]';
                 } else {
                     if ($ext === 'css') {
                         $has_css = true;
@@ -1308,7 +1311,7 @@ function smd_ebook_create()
                 $val = ps('smd_ebook_fld_author');
                 if (strpos($val, 'SMD_FLD_') !== false) {
                     $valfld = str_replace('SMD_FLD_', '', $val);
-                    $val = isset($row[$valfld]) ? ( ($valfld === 'AuthorID') ? get_author_name($row[$valfld]) : $row[$valfld] ) : '';
+                    $val = isset($row[$valfld]) ? (($valfld === 'AuthorID') ? get_author_name($row[$valfld]) : $row[$valfld] ) : '';
                 }
 
                 if ($val) {
@@ -1509,7 +1512,7 @@ function smd_ebook_create()
                         $toc_cnt++;
                         $hashval = $item->getAttribute('id');
 
-                        if ( (!isset($guide_refs['text'])) && ($toc_cnt === 1) ) {
+                        if ((!isset($guide_refs['text'])) && ($toc_cnt === 1) ) {
                             $guide_href = $firstfile . (($hashval && $is_mobi) ? '#'.$hashval : '');
                             $guide_refs['text'] = '<reference type="text" title="'.gTxt('smd_ebook_lbl_text').'" href="' . $guide_href . '" />';
                             $landmarks['bodymatter'] = href(gTxt('smd_ebook_lbl_text'), $guide_href, ' epub:type="bodymatter"');
@@ -1530,13 +1533,13 @@ function smd_ebook_create()
                         $hashBits = do_list($hashval, '-');
                         $indent = count($hashBits);
 
-                        if ( ($toc_cnt == 1) && ($indent > 1) ) {
+                        if (($toc_cnt === 1) && ($indent > 1)) {
                             // Doesn't start with h1 (begins h2, maybe) so scale back the indent.
                             // Without this, Textile produces invalid markup.
                             $offset = $indent - 1;
                         }
 
-                        $toc_cls = (($toc_cnt == 1) && $toc_class) ? '('.$toc_class.')' : '';
+                        $toc_cls = (($toc_cnt === 1) && $toc_class) ? '('.$toc_class.')' : '';
                         $toc[] = str_pad('', max(1, $indent-$offset), $wrapit) . $toc_cls.' ' . href($node, $cur_file.'#'.$hashval);
                     }
 
