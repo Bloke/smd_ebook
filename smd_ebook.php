@@ -2110,10 +2110,10 @@ function smd_ebook_tidy($msg = '')
         $to_delete = ps('smd_ebook_files');
 
         foreach ($to_delete as $del) {
-            $path = realpath($tmpdir . DS . $del);
+            $path = realpath(base64_decode($del));
 
-            if (is_readable($path)) {
-                unlink($path);
+            if (is_readable($path) && strpos($path, $tmpdir) === 0) {
+                smd_ebook_deltree($path);
             }
         }
 
@@ -2128,30 +2128,19 @@ function smd_ebook_tidy($msg = '')
     $filelist = array();
     $valid = array('mobi', 'html', 'ncx', 'opf', 'smd', 'xml');
     $tmp = get_pref('tempdir') . DS;
-
-    // Grab all files then remove unnecessary ones: faster than multiple globs
-    // for each file type and more robust than relying on GLOB_BRACE support
-    $allfiles = glob($tmp.'smd_ebook_*/*.*');
-
-    foreach ($allfiles as $file) {
-        $info = explode('.', $file);
-        $lastpart = count($info)-1;
-        $ext = trim($info[$lastpart]);
-        if (in_array($ext, $valid)) {
-            $filelist[] = $file;
-        }
-    }
+    $filelist = glob($tmp.'smd_ebook_*');
 
     echo n.'<div id="' . $smd_ebook_event . '_control" class="txp-control-panel">' . $btnbar . '</div>';
 
     $filesel = '';
+
     if ($filelist) {
         $filez = array();
 
-        foreach($filelist as $val) {
-            $val = basename($val);
-            $key = sanitizeForFile($val);
-            $filez[$key] = $val;
+        foreach ($filelist as $val) {
+            $key = base64_encode($val);
+            $dn = str_replace($tmpdir, '', $val);
+            $filez[$key] = $dn;
         }
 
         $selout[] = '<select id="smd_ebook_files" name="smd_ebook_files[]" class="list" size="20" multiple="multiple">';
@@ -2175,6 +2164,19 @@ function smd_ebook_tidy($msg = '')
     echo n.'</form>';
     echo n.endTable();
     echo n.'</div>';
+}
+
+// ------------------------
+// Remove an entire directory recursively.
+function smd_ebook_deltree($dir)
+{
+    $files = array_diff(scandir($dir), array('.','..'));
+
+    foreach ($files as $file) {
+      is_dir("$dir/$file") ? smd_ebook_deltree("$dir/$file") : unlink("$dir/$file");
+    }
+
+    return rmdir($dir);
 }
 
 // ------------------------
