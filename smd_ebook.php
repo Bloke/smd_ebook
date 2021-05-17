@@ -1388,8 +1388,8 @@ function smd_ebook_create()
 
                     if ($val) {
                         // Textile the content?
-                        $var = ${"txt_$thingy"};
-                        $content = (isset($var) && $var) ? trim($textile->TextileThis($val)) : trim($val);
+                        $var = "txt_$thingy";
+                        $content = (isset($$var) && $$var) ? trim($textile->TextileThis($val)) : trim($val);
 
                         if (!in_array($thingy, $setMany)) {
                             $reps['{smd_ebook_md_'.$thingy.'}'] = '<dc:'.$thingy.'>' . $content . '</dc:'.$thingy.'>';
