@@ -1153,7 +1153,7 @@ EOXSL;
 // The actual generation via kindlegen / zip is a separate step.
 function smd_ebook_create()
 {
-    global $smd_ebook_prefs, $img_dir;
+    global $smd_ebook_prefs, $img_dir, $skin, $txp_sections;
 
     include_once txpath.'/publish.php'; // For parse() etc.
 
@@ -1203,6 +1203,7 @@ function smd_ebook_create()
     $css = get_pref('smd_ebook_stylesheet', $smd_ebook_prefs['smd_ebook_stylesheet']['default']);
     $hdg = get_pref('smd_ebook_heading_level', $smd_ebook_prefs['smd_ebook_heading_level']['default']);
 
+    // @todo Take skin into account.
     if ($css) {
         $css_list = quote_list(do_list($css));
         $sheets = ($css_list) ? safe_rows('name, css', 'txp_css', "name IN (" . join(',', $css_list) . ")") : array();
@@ -1465,6 +1466,7 @@ function smd_ebook_create()
             //  2) The current HTML file's title is used instead of the overall book title.
             //  3) parse() is called twice to simulate secondpass. TODO: fix this
             $chap_title = isset($reps['{smd_ebook_chaptitle}']) ? $reps['{smd_ebook_chaptitle}'] : '';
+            $skin = $txp_sections[$row['Section']]['skin'];
             article_format_info($row); // Load article context
             $html_content = str_replace($html_from, array($reps['{smd_ebook_doctype}'], $reps['{smd_ebook_namespace}'], $reps['{smd_ebook_charset}'], $encoding, $row['Title'], $chap_title, $sheet, parse(parse($row['Body_html']))), $template['doc']);
 
