@@ -1155,9 +1155,9 @@ function smd_ebook_create()
 {
     global $smd_ebook_prefs, $img_dir;
 
-    @include_once txpath.'/lib/classTextile.php';
-    @include_once txpath.'/publish.php'; // for parse()
-    $textile = new Textile();
+    include_once txpath.'/publish.php'; // For parse() etc.
+
+    $textile = new \Textpattern\Textile\Parser();
 
     $template = smd_ebook_templates();
     $msg = '';
@@ -1389,7 +1389,7 @@ function smd_ebook_create()
                     if ($val) {
                         // Textile the content?
                         $var = "txt_$thingy";
-                        $content = (isset($$var) && $$var) ? trim($textile->TextileThis($val)) : trim($val);
+                        $content = (isset($$var) && $$var) ? trim($textile->parse($val)) : trim($val);
 
                         if (!in_array($thingy, $setMany)) {
                             $reps['{smd_ebook_md_'.$thingy.'}'] = '<dc:'.$thingy.'>' . $content . '</dc:'.$thingy.'>';
@@ -1438,7 +1438,7 @@ function smd_ebook_create()
                     $reps['{smd_ebook_manifest_authornote}'] = '<item id="smd_ebook_notes" media-type="application/xhtml+xml" href="'. $notefile.'" />';
                     $reps['{smd_ebook_spine_authornote}'] = '<itemref idref="smd_ebook_notes" />';
                     $guide_refs['notes'] = '<reference type="notes" title="' . gTxt('smd_ebook_lbl_authornote') . '" href="'.$notefile.'" />';
-                    $note_content = '<span id="smd_ebook_notes"></span>' . (($txt_authornote) ? $textile->TextileThis($val) : $val);
+                    $note_content = '<span id="smd_ebook_notes"></span>' . (($txt_authornote) ? $textile->parse($val) : $val);
 
                     // While it's 99% likely the actual title used for the eventual book has been found,
                     // there's a slim chance it hasn't. In that case, the current row's title is used as a fallback
@@ -1684,7 +1684,7 @@ function smd_ebook_create()
             $reps['{smd_ebook_manifest_toc}'] = '<item id="'.$toc_ref.'" media-type="application/xhtml+xml" href="'.$toc_file.'" />';
             $guide_refs['toc'] = '<reference type="toc" title="' . gTxt('smd_ebook_lbl_toc') . '" href="'.$toc_file.'" />';
             $landmarks['toc'] = href(gTxt('smd_ebook_lbl_toc'), $toc_file, ' epub:type="toc"');
-            $html_toc = $textile->TextileThis(join(n, $toc));
+            $html_toc = $textile->parse(join(n, $toc));
             $final_toc = str_replace(array('{smd_ebook_toc_list}', '{smd_ebook_stylesheet}', '{smd_ebook_toc}'), array($html_toc, $sheet, gTxt('smd_ebook_lbl_toc')), $template['toc']);
             $fp = fopen($ebook_path . $toc_file, "wb");
             fwrite($fp, trim($final_toc));
