@@ -17,9 +17,9 @@ $plugin['name'] = 'smd_ebook';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.20';
+$plugin['version'] = '0.3.0';
 $plugin['author'] = 'Stef Dawson';
-$plugin['author_uri'] = 'http://stefdawson.com/';
+$plugin['author_uri'] = 'https://stefdawson.com/';
 $plugin['description'] = 'Create e-books (e.g. ePub / Kindle) from Textpattern content';
 
 // Plugin load order:
@@ -194,12 +194,11 @@ if (!defined('txpinterface'))
 global $smd_ebook_prefs;
 smd_ebook_get_prefs();
 
-if(@txpinterface === 'admin') {
-    // Silence warnings because, although the plugin requires smd_crunchers for
-    // ePub creation, it'll function in a reduced capacity without it
-    @require_plugin('smd_crunchers');
+if (txpinterface === 'admin') {
+    load_plugin('smd_crunchers');
 
     global $smd_ebook_event;
+
     $smd_ebook_event = 'smd_ebook';
 
     $pub_prv = get_pref('smd_ebook_privs', $smd_ebook_prefs['smd_ebook_privs']['default']);
@@ -316,14 +315,14 @@ function smd_ebook_welcome($evt, $stp)
 
 // ------------------------
 // Stub with correct signature for being called via Txp
-function smd_ebook($evt='', $stp='')
+function smd_ebook($evt = '', $stp = '')
 {
     smd_ebook_ui();
 }
 
 // ------------------------
 // Interface for compiling the book
-function smd_ebook_ui($msg='', $listfile='', $report = '', $retval='', $ebook_folder='')
+function smd_ebook_ui($msg = '', $listfile = '', $report = '', $retval = '', $ebook_folder = '')
 {
     global $smd_ebook_event, $smd_ebook_prefs;
 
@@ -408,7 +407,7 @@ function smd_ebook_ui($msg='', $listfile='', $report = '', $retval='', $ebook_fo
 
         if ($num_btypes === 0) {
             $btype = graf(gTxt('smd_ebook_no_book_types'), ' class="error"');
-        } elseif ($num_btypes === 1){
+        } elseif ($num_btypes === 1) {
             reset($book_types);
             $btype = hInput('smd_ebook_type', key($book_types));
         } else {
@@ -1274,6 +1273,7 @@ function smd_ebook_create()
             // as they're only used once each
             if (!isset($reps['{smd_ebook_uid_ref}'])) {
                 $val = ps('smd_ebook_fld_uid');
+
                 if (strpos($val, 'SMD_FLD_') !== false) {
                     $valfld = str_replace('SMD_FLD_', '', $val);
                     $val = isset($row[$valfld]) ? $row[$valfld] : '';
@@ -1376,16 +1376,21 @@ function smd_ebook_create()
             // The following values can either come from the given field or be used verbatim
             // Firstly the title, description, subject, publisher and chapter title
             $setMany = array('chaptitle');
+
             foreach (array('title', 'description', 'subject', 'publisher', 'chaptitle') as $thingy) {
                 if (in_array($thingy, $setMany) || !isset($reps['{smd_ebook_md_'.$thingy.'}'])) {
                     $val = ps('smd_ebook_fld_'.$thingy);
+
                     if (strpos($val, 'SMD_FLD_') !== false) {
                         $valfld = str_replace('SMD_FLD_', '', $val);
                         $val = isset($row[$valfld]) ? $row[$valfld] : '';
                     }
+
                     if ($val) {
                         // Textile the content?
-                        $content = (isset($txt_{$thingy}) && $txt_{$thingy}) ? trim($textile->TextileThis($val)) : trim($val);
+                        $var = ${"txt_$thingy"};
+                        $content = (isset($var) && $var) ? trim($textile->TextileThis($val)) : trim($val);
+
                         if (!in_array($thingy, $setMany)) {
                             $reps['{smd_ebook_md_'.$thingy.'}'] = '<dc:'.$thingy.'>' . $content . '</dc:'.$thingy.'>';
                         }
@@ -2497,11 +2502,11 @@ function smd_ebook_is_isbn($isbn)
 
         for ($x=0; $x<=8; $x++) {
             $mp = $mpBase - $x;
-            $subTotal += ($mp * $isbn{$x});
+            $subTotal += ($mp * $isbn[$x]);
         }
 
         $rest = $subTotal % 11;
-        $checkDigit = $isbn{9};
+        $checkDigit = $isbn[9];
 
         if (strtolower($checkDigit) === 'x') {
             $checkDigit = 10;
@@ -2514,11 +2519,11 @@ function smd_ebook_is_isbn($isbn)
 
         for ($x=0; $x<=11; $x++) {
             $mp = ($x + 1) % 2 == 0 ? 3 : 1;
-            $subTotal += $mp * $isbn{$x};
+            $subTotal += $mp * $isbn[$x];
         }
 
         $rest = $subTotal % 10;
-        $checkDigit = $isbn{12};
+        $checkDigit = $isbn[12];
 
         if (strtolower($checkDigit) === 'x') {
             $checkDigit = 10;
