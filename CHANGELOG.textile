@@ -1,0 +1,19 @@
+h1. Changelog
+
+h2. 0.3.0 - 2021-05-dd
+
+* For Textpattern 4.7+
+* Fixed invalid curly braces array access syntax.
+* Fixed various warnings and PHP errors on modern versions.
+* Implemented latest (supported) spec for Kindle mobi files. Note that kindlegen is discontinued by Amazon.
+
+h2. 0.2.0 - 2013-06-13
+
+* For Textpattern 4.5.x.
+* Added ePub support.
+* Allowed images to be previewed.
+
+h2. 0.1.0 - 2012-03-19
+
+* Beta release
+

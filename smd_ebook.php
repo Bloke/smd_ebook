@@ -55,6 +55,8 @@ $plugin['flags'] = '3';
 // abc_string_name => Localized String
 
 $plugin['textpack'] = <<<EOT
+#@language en, en-gb, en-us
+#@owner smd_ebook
 #@smd_ebook
 smd_ebook_auto_toc => Automatically create ToC anchors on headings
 smd_ebook_auto_toc_headings => Create visible ToC from these heading numbers
@@ -146,7 +148,7 @@ smd_ebook_lbl_zip => ePub
 smd_ebook_malformed => Could not process HTML from {file}. Malformed?
 smd_ebook_not_filed => E-book NOT filed
 smd_ebook_not_found => File not found. Check path?
-smd_ebook_no_book_types => No book formats available. For mobi output, check that the kindlegen binary has been uploaded correctly and is executable, and your host has not disabled exec(). For ePub, ensure the smd_crunchers plugin is installed
+smd_ebook_no_book_types => No book formats available. For mobi output, check that the kindlegen binary has been uploaded correctly and is executable, and your host has not disabled exec(). For ePub, ensure the smd_crunchers plugin is installed.
 smd_ebook_no_files => No e-book files found
 smd_ebook_ok => Everything looks OK
 smd_ebook_opf_edit => Groups that can edit .opf
@@ -184,7 +186,7 @@ if (!defined('txpinterface'))
  *  -> Support for book description and other meta data
  *
  * @author Stef Dawson
- * @link   http://stefdawson.com/
+ * @link   https://stefdawson.com/
  */
 
 // TODO:
@@ -1061,7 +1063,7 @@ EODOC;
     // format files, and the .ncx is needed for b/c with ePub2, it makes sense to just transform
     // one to the other for ePub3, rather than make brand new templates.
     // Only of use if XSLTProcessor is compiled into PHP, though.
-    // Courtesy Liza Daly http://www.ibm.com/developerworks/xml/library/x-richlayoutepub/index.html?ca=drs-
+    // Courtesy Liza Daly.
     $template['ncx2end'] = <<<EOXSL
 <?xml version="1.0"?>
 <xsl:stylesheet version="1.0"
@@ -1367,7 +1369,7 @@ function smd_ebook_create()
                                     $lfout[] = $img_dest;
                                 }
                             } else {
-                                $reps['{smd_ebook_manifest_cover}'] = '<item id="cover-image" media-type="'.$mime_type.'" href="' . get_pref('path_to_site') . DS . $img_dir . DS . $img_file . '" />';
+                                $reps['{smd_ebook_manifest_cover}'] = '<item id="cover-image" media-type="'.$mime_type.'" properties="cover-image" href="' . get_pref('path_to_site') . DS . $img_dir . DS . $img_file . '" />';
                             }
                         }
                     }
@@ -2455,7 +2457,7 @@ function smd_ebook_priv_list($name, $val='')
 }
 
 // -------------------------------------------------------------
-// Frankenteined from http://www.php.net/manual/en/function.uniqid.php#88400
+// Frankenteined from https://www.php.net/manual/en/function.uniqid.php#87992
 function smd_ebook_uid()
 {
     $pr_bits = '';
@@ -2541,7 +2543,7 @@ function smd_ebook_is_isbn($isbn)
 }
 
 // -------------------------------------------------------------
-// Modified from http://stackoverflow.com/questions/3938120/check-if-exec-is-disabled
+// Modified from https://stackoverflow.com/questions/3938120/check-if-exec-is-disabled
 function smd_ebook_kindlegen_available()
 {
     global $smd_ebook_prefs;
@@ -2855,9 +2857,9 @@ h1. smd_ebook
 
 There are a few ways to create e-books suitable for e-readers like Kindle / Kobo / Nook / etc:
 
-* "Install Calibre":http://calibre-ebook.com/ and use the software to guide you towards creating your book.
+* "Install Calibre":https://calibre-ebook.com/ and use the software to guide you towards creating your book.
 * Install a plugin for Adobe InDesign and let it help you create the book from your DTP files.
-* Download the "command-line Kindlegen":http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000234621 tool, create all the input files manually and hope.
+* Download the Kindle Create tool, and create all the input files manually.
 * Use this plugin to convert one or more articles into an e-book.
 
 The last one is of course the focus of this plugin! Features:
@@ -2872,22 +2874,22 @@ The last one is of course the focus of this plugin! Features:
 
 h2. Installation / uninstallation
 
-p(important). Requires Textpattern 4.5.0+. "smd_crunchers":http://stefdawson.com/smd_crunchers required for ePub generation.
+p(important). Requires Textpattern 4.5.0+. "smd_crunchers":https://stefdawson.com/smd_crunchers required for ePub generation.
 
-Download the plugin from either "textpattern.org":http://textpattern.org/plugins/NNNN/smd_ebook, or the "software page":http://stefdawson.com/sw, paste the code into the Txp _Admin->Plugins_ pane, install and enable the plugin. Visit the "forum thread":http://forum.textpattern.com/viewtopic.php?id=YYYYY for more info or to report on the success or otherwise of the plugin.
+Download the plugin from either "GitHub":https://github.com/Bloke/smd_ebook, or the "software page":https://stefdawson.com/sw, paste the code into Textpattern's _Admin->Plugins_ pane, install and enable the plugin. Visit the "forum thread":https://forum.textpattern.com/viewtopic.php?id=YYYYY for more info or to report on the success or otherwise of the plugin.
 
 To remove the plugin, simply delete it from the _Admin->Plugins_ pane.
 
 h2. Setting up for Kindle (mobi)
 
-# Obtain the "kindlegen program":http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000234621 that is compatible with your web host -- most likely the Linux version. While you're there you might as well grab the (huge!) Kindle Previewer too as it's very handy to test files made with this plugin.
+# Obtain the kindlegen program that is compatible with your web host -- most likely the Linux version. Unfortunately, Amazon have discontinued support for this tool so any files it creates are only for legacy Kindle products that support .mobi files. The wyaback machine hosts the most recent supported version.
 # Upload kindlegen via your FTP program *as binary* to a location of your choosing on your web host; preferably outside document root so it can't be run by other people. Double check it is uploaded as binary -- some FTP software (e.g. FileZilla) is set to auto-negotiate the file type and often gets it wrong. If the plugin doesn't work, this is the most likely source of failure.
 # Visit the _Content->E-books_ panel with a Publisher level account and hit the _Settings_ button. Configure the _Path to kindlegen executable_ to reflect the location of your uploaded kindlegen file. Set up any other relevant settings while you are here and save them.
 # *After saving the settings* you can click the _Test kindlegen program_ link to check that the program is uploaded correctly and the plugin can find it. If everything is OK, you will be told so in a text box that appears below the link. If the kindlegen file produces errors or cannot be found, the error messages will be shown instead.
 
 h2. Setting up for ePub
 
-* Download "smd_crunchers":http://stefdawson.com/smd_crunchers.
+* Download "smd_crunchers":https://stefdawson.com/smd_crunchers.
 * Install and activate the plugin.
 
 h2. Writing content suitable for E-readers
@@ -2932,7 +2934,7 @@ h3(#smd_ebook_images). Inline images
 
 It may seem tempting to use Textpattern's image tags in articles to insert inline images. While this works and looks good in the plugin's Preview window, the images will not be rendered in the final downloadable book. If you study the Report closely you'll see that kindlegen struggles with such images, stating it cannot find them.
 
-The reason for this is that kindlegen expects images and embedded content to be presented as _files_ not _URLs_. Textpattern's image tags (and those in image plugins) all output URLs of the form @http://site.com/images/NN.ext@ by default. In order to use images in the final e-book you need to specify images as @/path/to/site/images/NN.ext@. You can do this fairly easily with the @<txp:images>@ tag and @<txp:image_info />@, like this:
+The reason for this is that kindlegen expects images and embedded content to be presented as _files_ not _URLs_. Textpattern's image tags (and those in image plugins) all output URLs of the form @https://site.com/images/NN.ext@ by default. In order to use images in the final e-book you need to specify images as @/path/to/site/images/NN.ext@. You can do this fairly easily with the @<txp:images>@ tag and @<txp:image_info />@, like this:
 
 bc(block). <txp:images name="my-pic.jpg">
    <img
@@ -2941,7 +2943,7 @@ bc(block). <txp:images name="my-pic.jpg">
      title="<txp:image_info />" />
 </txp:images>
 
-For convenience you could set this content up as an smd_macro.
+For convenience you could set this content up as a "short code":https://docs.textpattern.com/tags/shortcodes/custom-short-tags-and-shortcodes.
 
 The plugin's [Preview] window will detect the fact your images are using paths and attempt to swap them for URLs on the fly so you can see them in the preview. It may not work on Windows hosts or if you have your images in a separate domain.
 
@@ -3001,10 +3003,10 @@ h3. Publishing
 ; *Get SRP (price) from field*
 : Nominate an article field to set the download price of the article. Leave this item empty to allow the info to be entered at book compilation time, or choose _Static text_ then enter a price and optional three-letter currency code (e.g. USD, GBP, EUR), separated by a pipe symbol, that will be applied to all created books. If the currency is not supplied it will be taken from the setting _Default three-letter currency code_.
 ; *Default three-letter currency code*
-: The three-letter "currency code":http://www.xe.com/iso4217.php of the default currency to use for the book's price.
+: The three-letter "currency code":https://www.xe.com/iso4217.php of the default currency to use for the book's price.
 : Default: @EUR@
 ; *Get unique ID from field*
-: Nominate an article field to set a unique reference identifier for the book. Leave this item empty to allow the info to be entered at book compilation time, or choose _Static text_ and enter a value that will be applied to all created books (although this is not recommended for creating multiple books as each "UUID":http://en.wikipedia.org/wiki/Universally_unique_identifier code *must* be unique). You may use this field to store the e-book's ISBN. The plugin will recognise these and output the appropriate markup.
+: Nominate an article field to set a unique reference identifier for the book. Leave this item empty to allow the info to be entered at book compilation time, or choose _Static text_ and enter a value that will be applied to all created books (although this is not recommended for creating multiple books as each "UUID":https://en.wikipedia.org/wiki/Universally_unique_identifier code *must* be unique). You may use this field to store the e-book's ISBN. The plugin will recognise these and output the appropriate markup.
 ; *Guide tags defined in field*:
 : To help people jump between structural components of e-books, you can 'tag' (or label / reference / whatever you want to call it) sections of the book as containing certain types of content. For example, the ToC, an acknowledgements page, glossary, index, bibliography, and so on. If you would like to take advantage of this, specify a custom field here that may contain comma-separated identifiers for the plugin to treat as Guide tags. It works well if you reuse the same custom field as __Get unique ID from field__. The following are valid identifiers to put in this field:
 :: *acknowledgments* (note: spelling)
@@ -3066,7 +3068,7 @@ You may specify an output filename for your final masterpiece if you wish. If yo
 
 A note about the Price field: you specify up to two pieces of info in this field, separated by a pipe symbol (@|@). First the price itself and then the three-letter currency code (e.g. GBP, EUR, USD, AUD, etc). If the currency code is not supplied, the setting _Default three-letter currency code_ will be used.
 
-After clicking _Create_, the plugin will collate all the selected articles and meta data and try to produce a complete e-book. If you chose Kindle, this will be a .mobi file; for ePub format, it tries to create a zip file if the "smd_crunchers":http://stefdawson.com/smd_crunchers plugin is installed. The success or otherwise of the process is shown in the _Build report_ box. Scroll through this info to find any errors. You may need to go back to your source documents to fix them. Alternatively you may be able to fix the problems by manually editing the various files that make up the project.
+After clicking _Create_, the plugin will collate all the selected articles and meta data and try to produce a complete e-book. If you chose Kindle, this will be a .mobi file; for ePub format, it tries to create a zip file if the "smd_crunchers":https://stefdawson.com/smd_crunchers plugin is installed. The success or otherwise of the process is shown in the _Build report_ box. Scroll through this info to find any errors. You may need to go back to your source documents to fix them. Alternatively you may be able to fix the problems by manually editing the various files that make up the project.
 
 All files are listed on the left hand side of the screen. Although each project is different, the various components that may be present are:
 
@@ -3082,14 +3084,14 @@ You can click [Edit] under any file name to open it for editing in the adjacent 
 If you wish to create an article with a specific language string you can do one of two things:
 
 # Manually alter the .ncx file's @xml:lang@ attribute and the .opf file's @<dc:language>@ markup.
-# Change Textpattern's admin side language from the _Admin->Preferences_ tab, then regenerate your book.
+# Change Textpattern's admin side language from the _Admin->Languages_ tab, then regenerate your book.
 
 Upon successful completion of the process you can choose whether to:
 
 * Click the _Store file_ button to copy the complete e-book file to Textpattern's Files tab. If the file does not exist, it will be created. If it exists, it will be updated with the new details (title and description as you entered them in the input boxes when the book was created, and the category as set in the plugin settings).
 * Click the _Download_ button to download a copy of the complete e-book to your computer, whereby it's a good idea to test it in Kindle Previewer or Calibre, or transfer it to your real e-reader and check the navigation and formatting are to your satisfaction.
 
-If you download your content, it is strongly suggested that you try the e-book on as many devices as you can to check for formatting errors. Amazon have the Kindle Previewer, and Calibre has a Viewer tool. Other software may exist too. Note that since kindlegen handles formatting and conversion, any generation warnings or errors are displayed in the report. But for ePub files, only broad checks are made as the package is built. It may be advantageous, therefore, to run them through a validator such as "ePubCheck":http://code.google.com/p/epubcheck/ or an "online checker":http://validator.idpf.org/.
+If you download your content, it is strongly suggested that you try the e-book on as many devices as you can to check for formatting errors. Amazon have the Kindle Previewer, and Calibre has a Viewer tool. Other software may exist too. Note that since kindlegen handles formatting and conversion, any generation warnings or errors are displayed in the report. But for ePub files, only broad checks are made as the package is built. It may be advantageous, therefore, to run them through a validator such as "ePubCheck":https://github.com/w3c/epubcheck or an "online checker":http://validator.idpf.org/.
 
 h2. Tidying up
 
@@ -3101,14 +3103,10 @@ Select the files you want to delete and hit the _Delete_ button. No warning is g
 
 h2. Author and credits
 
-Plugin written by "Stef Dawson":http://stefdawson.com/contact. For other software by me, or to make a donation, see the "software page":http://stefdawson.com/sw.
+Plugin written by "Stef Dawson":https://stefdawson.com/contact. For other software by me, or to make a donation, see the "software page":https://stefdawson.com/sw.
 
 While the code to glue all the various parts together is mine, the various websites, blogs and forums I had to trawl to gather the info are many. Thank you to anybody who has posted Kindle / ePub / .mobi / e-reader tricks, tips and guides. Without you I could not have completed this plugin because official documentation on the kindlegen program is surprisingly lacking. Thanks also to Amazon techs for writing the kindlegen program.
 
-h2. Changelog
-
-* 19 Mar 2012 | 0.10 | Beta release
-* 13 Jun 2013 | 0.20 | For textpattern 4.5.x; added ePub support; allowed images to be previewed
 # --- END PLUGIN HELP ---
 -->
 <?php
