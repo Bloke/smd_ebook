@@ -656,7 +656,7 @@ EOJS;
         $opf_edit = get_pref('smd_ebook_opf_edit', $smd_ebook_prefs['smd_ebook_opf_edit']['default']);
         $opf_allowed = do_list($opf_edit);
         $opf_allowed[] = '1'; // Publishers can always edit .opf
-        $can_opf = in_array($GLOBALS['privs'], $opf_allowed);
+        $can_opf = !empty($GLOBALS['privs']) && in_array($GLOBALS['privs'], $opf_allowed);
 
         $files = file($ebook_path . $listfile);
         $files = doArray($files, 'trim');
