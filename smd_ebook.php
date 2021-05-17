@@ -1486,7 +1486,9 @@ function smd_ebook_create()
             // Use UNIX line endings to prevent &#13; appearing in the saved XML
             $html_content = preg_replace('/\r\n/', "\n", $html_content);
 
+            libxml_use_internal_errors(true);
             $dom_ok = $doc->loadHTML($html_content);
+            libxml_clear_errors();
 
             if ($dom_ok) {
                 $items = $doc->getElementsByTagName('*');
