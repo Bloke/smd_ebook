@@ -2098,7 +2098,7 @@ function smd_ebook_buttons($curr='mgr')
 }
 
 // ------------------------
-// Tidy up the temp dir
+// Tidy up the temp dir.
 function smd_ebook_tidy($msg = '')
 {
     global $smd_ebook_event;
@@ -2126,9 +2126,9 @@ function smd_ebook_tidy($msg = '')
     $btnbar = (has_privs('plugin_prefs.'.$smd_ebook_event))? '<span class="smd_ebook_buttons">'.$btnMgr.n.$btnPrf.n.$btnCln.'</span>' : '';
 
     $filelist = array();
-    $valid = array('mobi', 'html', 'ncx', 'opf', 'smd', 'xml');
+    $valid = array('mobi', 'epub');
     $tmp = get_pref('tempdir') . DS;
-    $filelist = glob($tmp.'smd_ebook_*');
+    $filelist = glob($tmp.'smd_ebook_*'.DS.'*.*');
 
     echo n.'<div id="' . $smd_ebook_event . '_control" class="txp-control-panel">' . $btnbar . '</div>';
 
@@ -2137,10 +2137,20 @@ function smd_ebook_tidy($msg = '')
     if ($filelist) {
         $filez = array();
 
-        foreach ($filelist as $val) {
-            $key = base64_encode($val);
-            $dn = str_replace($tmpdir, '', $val);
-            $filez[$key] = $dn;
+        foreach ($filelist as $file) {
+            $info = explode('.', $file);
+            $lastpart = count($info) - 1;
+            $ext = trim($info[$lastpart]);
+
+            if (in_array($ext, $valid)) {
+                $dn = dirname($file);
+                $key = base64_encode($dn);
+                $viz = str_replace($tmpdir, '', $dn);
+
+                if (!isset($filez[$key])) {
+                    $filez[$key] = txpspecialchars($viz . ' ('. basename($file) .')');
+                }
+            }
         }
 
         $selout[] = '<select id="smd_ebook_files" name="smd_ebook_files[]" class="list" size="20" multiple="multiple">';
