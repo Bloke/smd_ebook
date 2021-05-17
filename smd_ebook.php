@@ -1207,15 +1207,22 @@ function smd_ebook_create()
     $pbr = get_pref('smd_ebook_page_break', $smd_ebook_prefs['smd_ebook_page_break']['default']);
     $css = get_pref('smd_ebook_stylesheet', $smd_ebook_prefs['smd_ebook_stylesheet']['default']);
     $hdg = get_pref('smd_ebook_heading_level', $smd_ebook_prefs['smd_ebook_heading_level']['default']);
+    $sheets = array();
 
-    // @todo Take skin into account.
     if ($css) {
-        $css_list = quote_list(do_list($css));
-        $sheets = ($css_list) ? safe_rows('name, css', 'txp_css', "name IN (" . join(',', $css_list) . ")") : array();
+        $css_list = do_list($css);
+
+        foreach ($css_list as $sheetref) {
+            $css_parts = do_list($sheetref, '.');
+            $cskin = doSlash($css_parts[0]);
+            $cname = doSlash($css_parts[1]);
+            $sheets[] = safe_row('name, css', 'txp_css', "name = '$cname' AND skin = '$cskin'");
+        }
     }
 
     $sheetlist = $sheetcontent = array();
     $sheet_count = 0;
+    $sheets = array_filter($sheets);
 
     foreach ($sheets as $stylething) {
         $content = trim($stylething['css']);
@@ -2352,7 +2359,7 @@ function smd_ebook_test()
 
 // ------------------------
 // List of numbers for heading levels
-function smd_ebook_number($name, $val='')
+function smd_ebook_number($name, $val = '')
 {
     // Can't use range() since it creates indices starting at 0
     $nums = array();
@@ -2364,7 +2371,7 @@ function smd_ebook_number($name, $val='')
 
 // ------------------------
 // List of current file categories
-function smd_ebook_file_cat_list($name, $val='')
+function smd_ebook_file_cat_list($name, $val = '')
 {
     $rs = getTree('root', 'file');
     if ($rs) {
@@ -2374,9 +2381,9 @@ function smd_ebook_file_cat_list($name, $val='')
 
 // ------------------------
 // Multi-select list of current stylesheets
-function smd_ebook_style_list($name, $val='')
+function smd_ebook_style_list($name, $val = '')
 {
-    $styles = safe_column('name', 'txp_css', '1=1');
+    $styles = safe_rows('name, skin', 'txp_css', '1=1');
     $sels = do_list($val);
 
     $ulist = array();
@@ -2384,8 +2391,8 @@ function smd_ebook_style_list($name, $val='')
     $ulist[] = '<option value=""></option>';
 
     foreach ($styles as $style) {
-        $selected = in_array($style, $sels) ? ' selected="selected"' : '';
-        $ulist[] = '<option value="'.$style.'"'.$selected.'>' . txpspecialchars($style) . '</option>';
+        $selected = in_array($style['skin'].'.'.$style['name'], $sels) ? ' selected="selected"' : '';
+        $ulist[] = '<option value="'.txpspecialchars($style['skin']).'.'.txpspecialchars($style['name']).'"'.$selected.'>' . txpspecialchars($style['name'] . ' ('.$style['skin'].')') . '</option>';
     }
 
     $ulist[] = '</select>';
@@ -2396,7 +2403,7 @@ function smd_ebook_style_list($name, $val='')
 // ------------------------
 // List of current sections
 // TODO: multiple select?
-function smd_ebook_section_list($name, $val='')
+function smd_ebook_section_list($name, $val = '')
 {
     $secs = safe_column('name', 'txp_section', '1=1');
 
@@ -2405,7 +2412,7 @@ function smd_ebook_section_list($name, $val='')
 
 // ------------------------
 // Select list of custom fields
-function smd_ebook_cf_list($name, $val='')
+function smd_ebook_cf_list($name, $val = '')
 {
     $cfs = getCustomFields();
 
@@ -2414,7 +2421,7 @@ function smd_ebook_cf_list($name, $val='')
 
 // ------------------------
 // Select list of custom fields with a few extras
-function smd_ebook_fld_list($name, $val='')
+function smd_ebook_fld_list($name, $val = '')
 {
     $cfs = getCustomFields();
     $cfs['Title'] = gTxt('title');
@@ -2426,7 +2433,7 @@ function smd_ebook_fld_list($name, $val='')
 
 // ------------------------
 // Select list of custom fields with a few more extras
-function smd_ebook_fld_list_plus($name, $val='')
+function smd_ebook_fld_list_plus($name, $val = '')
 {
     $cfs = getCustomFields();
     $cfs['Title'] = gTxt('title');
@@ -2441,7 +2448,7 @@ function smd_ebook_fld_list_plus($name, $val='')
 
 // ------------------------
 // List of custom fields
-function smd_ebook_fld_list_author($name, $val='')
+function smd_ebook_fld_list_author($name, $val = '')
 {
     $cfs = getCustomFields();
     $cfs['Title'] = gTxt('title');
@@ -2454,7 +2461,7 @@ function smd_ebook_fld_list_author($name, $val='')
 
 // ------------------------
 // Multi-select list of privilege levels
-function smd_ebook_priv_list($name, $val='')
+function smd_ebook_priv_list($name, $val = '')
 {
     $grps = get_groups();
     unset($grps['0']); // Remove 'none'
