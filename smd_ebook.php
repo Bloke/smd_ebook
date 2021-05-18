@@ -2923,7 +2923,7 @@ h2. Writing content suitable for E-readers
 While the technology and tools are improving, there are some guidelines and things to be aware of when creating content in Textpattern that will translate well into a good e-reader experience:
 
 * Use headings to create chapters or logical breaks in your prose. You can create many articles if you wish -- perhaps one article per chapter -- and create a single file from them, or create the entire book in one article.
-* Supply cover art. This must be a GIF or JPG image of dimensions 600 (w) x 800 (h) pixels. Assign the ID of the cover image uploaded to Textpattern in the _Article Image_ field of the first chapter.
+* Supply cover art. This must be a GIF or JPG image, with recommended dimensions 2560 (w) x 1600 (h) pixels - minimum 1000 (w) x 625 (h). Assign the ID of the cover image uploaded to Textpattern in the _Article Image_ field of the first chapter.
 * Create stylesheet(s) to lay out your table of contents or alter facets of your book. Formatting is often hit and miss because e-readers use their own internal styles, but some things can be influenced with a stylesheet. Tinker with it to see what effects you can create.
 * "Inline images":#smd_ebook_images cannot flow around text in early devices -- they always appear block style.
 * Add author notes to a field in your first article -- such notes appear after the cover image and before the ToC. Copyright info and acknowledgements are useful here. See the setting _Get author notes from field_.
