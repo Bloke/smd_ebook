@@ -79,7 +79,7 @@ h3(#smd_ebook_images). Inline images
 
 It may seem tempting to use Textpattern's image tags in articles to insert inline images. While this works and looks good in the plugin's Preview window, the images will not be rendered in the final downloadable book. If you study the Report closely you'll see that kindlegen struggles with such images, stating it cannot find them.
 
-The reason for this is that kindlegen expects images and embedded content to be presented as _files_ not _URLs_. Textpattern's image tags (and those in image plugins) all output URLs of the form @https://site.com/images/NN.ext@ by default. In order to use images in the final e-book you need to specify images as @/path/to/site/images/NN.ext@. You can do this fairly easily with the @<txp:images>@ tag and @<txp:image_info />@, like this:
+The reason for this is that kindlegen expects images and embedded content to be presented as files, not URLs. distinction. Textpattern's image tags (and those in image plugins) all output URLs of the form @https://site.com/images/NN.ext@ by default. In order to use images in the final e-book you need to specify images as @/path/to/site/images/NN.ext@. You can do this fairly easily with the @<txp:images>@ tag and @<txp:image_info />@, like this:
 
 bc(block). <txp:images name="my-pic.jpg">
    <img
