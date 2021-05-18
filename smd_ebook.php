@@ -3094,7 +3094,7 @@ You may specify an output filename for your final masterpiece if you wish. If yo
 
 A note about the Price field: you specify up to two pieces of info in this field, separated by a pipe symbol (@|@). First the price itself and then the three-letter currency code (e.g. GBP, EUR, USD, AUD, etc). If the currency code is not supplied, the setting _Default three-letter currency code_ will be used.
 
-After clicking _Create_, the plugin will collate all the selected articles and meta data and try to produce a complete e-book. If you chose Kindle, this will be a .mobi file; for ePub format, it tries to create a zip file if the "smd_crunchers":https://stefdawson.com/smd_crunchers plugin is installed. The success or otherwise of the process is shown in the _Build report_ box. Scroll through this info to find any errors. You may need to go back to your source documents to fix them. Alternatively you may be able to fix the problems by manually editing the various files that make up the project.
+After clicking Create, the plugin will collate all the selected articles and meta data and try to produce a complete e-book. If you chose Kindle, this will be a .mobi file; for ePub format, it tries to create a zip file if the "smd_crunchers":https://stefdawson.com/smd_crunchers plugin is installed. The success or otherwise of the process is shown in the _Build report_ box. Scroll through this info to find any errors. You may need to go back to your source documents to fix them. Alternatively you may be able to fix the problems by manually editing the various files that make up the project.
 
 All files are listed on the left hand side of the screen. Although each project is different, the various components that may be present are:
 
