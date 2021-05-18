@@ -2900,7 +2900,7 @@ The last one is of course the focus of this plugin! Features:
 
 h2. Installation / uninstallation
 
-p(important). Requires Textpattern 4.5.0+. "smd_crunchers":https://stefdawson.com/smd_crunchers required for ePub generation.
+p(important). Requires Textpattern 4.7.0+. "smd_crunchers":https://stefdawson.com/smd_crunchers required for ePub generation.
 
 Download the plugin from either "GitHub":https://github.com/Bloke/smd_ebook, or the "software page":https://stefdawson.com/sw, paste the code into Textpattern's _Admin->Plugins_ pane, install and enable the plugin. Visit the "forum thread":https://forum.textpattern.com/viewtopic.php?id=YYYYY for more info or to report on the success or otherwise of the plugin.
 
