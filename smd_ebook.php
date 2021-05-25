@@ -804,21 +804,118 @@ function smd_ebook_viewfile()
 
         $nodeStyle = $domxpath->query('//style');
         $nodeList = $domxpath->query('//body');
+        $sheetlist = array();
+
+        // Grab destination stylesheet(s).
+        $sheets = smd_ebook_get_stylesheets();
+
+        foreach ($sheets as $stylething) {
+            // Split the css file into its components and prepend each rule.
+            $content = smd_ebook_parse_css(trim($stylething['css']), '#smd_ebook_preview_content ');
+
+            if ($content) {
+                // Reconstruct the CSS file from the arrays.
+                foreach ($content as $wrapper => $ruleset) {
+                    $groupz = '';
+
+                    foreach ($ruleset as $selector => $rules) {
+                        $rulez = '';
+
+                        foreach ($rules as $key => $value) {
+                            $rulez .= $key.':'. $value.';'.n;
+                        }
+
+                        $groupz .= $selector. ' {'.n.$rulez.n.'}'.n;
+                    }
+
+                    $block = ($wrapper === 0) ? $groupz : $wrapper. ' {'.n.$groupz.n.'}'.n;
+                    $sheetlist[] = $block;
+                }
+            }
+        }
+
+        $sheet = $sheetlist ? implode(n, $sheetlist) : '';
 
         // Create a new document and import the document subsets
         if ($nodeStyle->item(0)) {
             $newDoc->appendChild($newDoc->importNode($nodeStyle->item(0), true));
         }
+
+        if ($sheet) {
+            $element = $newDoc->createElement('style', $sheet);
+            $newDoc->appendChild($element);
+        }
+
         if ($nodeList->item(0)) {
             $newDoc->appendChild($newDoc->importNode($nodeList->item(0), true));
         }
+
         $out = $newDoc->saveHTML();
 
-        // Translate any images with absolute paths into URLs
+        // Translate any images with absolute paths into URLs.
         echo json_encode(array('data' => str_replace($path_to_site.DS, ihu, $out)));
     }
 
     exit; // Don't display page_end
+}
+
+// Parse a CSS file into its components.
+function smd_ebook_parse_css($css, $prepend = '')
+{
+    // Initialise with 0 element first so media queries will be appended.
+    $result = array(0 => '');
+    $mediaPat = '~(@media\b[^{]*)({((?:[^{}]+|(?2))*)})~';
+    $rulepat = <<<EOREG
+/([a-z0-9\s\.\:#_\-@,%\[\]()'"=*\\>~\/+]+)\{([^\}]*)\}/si
+EOREG;
+    // Extract media queries first, because optional nested entries
+    // are difficult to handle in a single regex.
+    preg_match_all($mediaPat, $css, $matches, PREG_SET_ORDER);
+
+    foreach ($matches as $mqset) {
+        $selector = trim($mqset[1]);
+        preg_match_all($rulepat, $mqset[3], $subblocks);
+        $result[$selector] = smd_ebook_style_rules($subblocks, $prepend);
+
+        // Remove the media query from the input, since we've processed it already.
+        $css = str_replace($mqset[0], '', $css);
+    }
+
+    // Deal with the remaining non-media-query rules and assign them to
+    // a special '0' array entry.
+    preg_match_all($rulepat, $css, $ruleset);
+    $result[0] = smd_ebook_style_rules($ruleset, $prepend);
+
+    return $result;
+}
+
+// Split a CSS ruleset into individual rules.
+// Optionally prepend content to each rule.
+function smd_ebook_style_rules($ruleset, $prepend = '')
+{
+    $result = array();
+
+    foreach ($ruleset[0] as $i => $x) {
+        $selector = trim($ruleset[1][$i]);
+        $rules_arr = array();
+        $rules = explode(';', trim($ruleset[2][$i]));
+
+        foreach ($rules as $strRule) {
+            if (!empty($strRule)) {
+                $rule = explode(':', $strRule);
+                $rules_arr[trim($rule[0])] = trim($rule[1]);
+            }
+        }
+
+        $selectors = explode(',', trim($selector));
+
+        foreach ($selectors as $strSel) {
+            $combined = $prepend.$strSel;
+            $result[$combined] = $rules_arr;
+        }
+    }
+
+    return $result;
 }
 
 // ------------------------
@@ -1205,24 +1302,10 @@ function smd_ebook_create()
 
     // Page break, stylesheets and heading references
     $pbr = get_pref('smd_ebook_page_break', $smd_ebook_prefs['smd_ebook_page_break']['default']);
-    $css = get_pref('smd_ebook_stylesheet', $smd_ebook_prefs['smd_ebook_stylesheet']['default']);
     $hdg = get_pref('smd_ebook_heading_level', $smd_ebook_prefs['smd_ebook_heading_level']['default']);
-    $sheets = array();
-
-    if ($css) {
-        $css_list = do_list($css);
-
-        foreach ($css_list as $sheetref) {
-            $css_parts = do_list($sheetref, '.');
-            $cskin = doSlash($css_parts[0]);
-            $cname = doSlash($css_parts[1]);
-            $sheets[] = safe_row('name, css', 'txp_css', "name = '$cname' AND skin = '$cskin'");
-        }
-    }
-
+    $sheets = smd_ebook_get_stylesheets();
     $sheetlist = $sheetcontent = array();
     $sheet_count = 0;
-    $sheets = array_filter($sheets);
 
     foreach ($sheets as $stylething) {
         $content = trim($stylething['css']);
@@ -2196,9 +2279,33 @@ function smd_ebook_deltree($dir)
     return rmdir($dir);
 }
 
+// Grab stylesheets from prefs and make an array from them.
+function smd_ebook_get_stylesheets()
+{
+    global $smd_ebook_prefs;
+
+    $css = get_pref('smd_ebook_stylesheet', $smd_ebook_prefs['smd_ebook_stylesheet']['default']);
+    $sheets = array();
+
+    if ($css) {
+        $css_list = do_list($css);
+
+        foreach ($css_list as $sheetref) {
+            $css_parts = do_list($sheetref, '.');
+            $cskin = doSlash($css_parts[0]);
+            $cname = doSlash($css_parts[1]);
+            $sheets[] = safe_row('name, css', 'txp_css', "name = '$cname' AND skin = '$cskin'");
+        }
+    }
+
+    $sheets = array_filter($sheets);
+
+    return $sheets;
+}
+
 // ------------------------
 // Handle the prefs panel
-function smd_ebook_prefs($msg='')
+function smd_ebook_prefs($msg = '')
 {
     global $smd_ebook_event, $smd_ebook_prefs, $step;
 
