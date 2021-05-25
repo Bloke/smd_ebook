@@ -6,6 +6,7 @@ h2. 0.3.0 - 2021-05-dd
 * Fixed invalid curly braces array access syntax.
 * Fixed various warnings and PHP errors on modern versions.
 * Implemented latest (supported) spec for Kindle mobi files. Note that kindlegen is discontinued by Amazon.
+* Stylesheets are imported during file preview for a better experience.
 
 h2. 0.2.0 - 2013-06-13
 
