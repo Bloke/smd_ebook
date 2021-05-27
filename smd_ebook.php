@@ -1268,7 +1268,7 @@ function smd_ebook_create()
     // Generate a temporary folder name to store all files in.
     // It's based on the passed params so if you're regenerating the same book
     // and don't alter the POST payload, you'll overwrite stuff in the previous
-    // folder for this book. Just keeps the clutter down..
+    // folder for this book. Just keeps the clutter down.
     $ebook_folder = 'smd_ebook_' . substr(md5(serialize($_POST)), 0, 12);
     $ebook_path = get_pref('tempdir') . DS . $ebook_folder . DS;
 
@@ -1276,23 +1276,23 @@ function smd_ebook_create()
         mkdir($ebook_path);
     }
 
-    // Store the current type for next time this user creates a book
+    // Store the current type for next time this user creates a book.
     $bType = ps('smd_ebook_type');
     set_pref('smd_ebook_type', doSlash($bType), 'smd_ebook', PREF_HIDDEN, 'text_input', 0, PREF_PRIVATE);
     $is_mobi = ($bType === 'mobi');
     $is_epub = ($bType === 'zip');
-    $outfile = trim(ps('smd_ebook_pubfile')); // If used, it's without extension
+    $outfile = trim(ps('smd_ebook_pubfile')); // If used, it's without extension.
 
-    // Get Textile and encoding options
+    // Get Textile and encoding options.
     $encoding = get_pref('smd_ebook_encoding', $smd_ebook_prefs['smd_ebook_encoding']['default']);
     $which = get_pref('smd_ebook_textile', $smd_ebook_prefs['smd_ebook_textile']['default']);
     $txt_description = in_list('description', $which);
     $txt_authornote = in_list('authornote', $which);
 
     // Build up a giant replacement table which is then substituted into
-    // the various templates before passing to the generator
+    // the various templates before passing to the generator.
 
-    // Set up the TOC wrappers
+    // Set up the TOC wrappers.
     $toc_wrap = get_pref('smd_ebook_toc_wraptag', $smd_ebook_prefs['smd_ebook_toc_wraptag']['default']);
     $toc_class = get_pref('smd_ebook_toc_class', $smd_ebook_prefs['smd_ebook_toc_class']['default']);
     $wrapit = ($toc_wrap === 'ol') ? '#' : '*';
@@ -1300,7 +1300,7 @@ function smd_ebook_create()
     $article_cnt = $ncx_cnt = $elem_cnt = $img_cnt = 0;
     $article_refs = $article_spines = $guide_refs = $landmarks = $master_image_refs = array();
 
-    // Page break, stylesheets and heading references
+    // Page break, stylesheets and heading references.
     $pbr = get_pref('smd_ebook_page_break', $smd_ebook_prefs['smd_ebook_page_break']['default']);
     $hdg = get_pref('smd_ebook_heading_level', $smd_ebook_prefs['smd_ebook_heading_level']['default']);
     $sheets = smd_ebook_get_stylesheets();
@@ -1311,10 +1311,10 @@ function smd_ebook_create()
         $content = trim($stylething['css']);
 
         if ($is_mobi && $content) {
-            // Inline style tags
+            // Inline style tags.
             $sheetlist[] = '<style type="text/css">' . $content . '</style>';
         } elseif ($is_epub && $content) {
-            // External stylesheet references
+            // External stylesheet references.
             $sheetname = $stylething['name'] . '.css';
             $sheetlist[] = '<link rel="stylesheet" media="screen" href="'.$sheetname.'" />';
             $sheetcontent[$stylething['name']] = $content;
@@ -1329,15 +1329,15 @@ function smd_ebook_create()
 
     $sheet = join(n, $sheetlist);
 
-    // The values used in the 'doc' template
+    // The values used in the 'doc' template.
     $html_from = array('{smd_ebook_doctype}', '{smd_ebook_namespace}', '{smd_ebook_charset}', '{smd_ebook_encoding}', '{smd_ebook_title}', '{smd_ebook_chaptitle}', '{smd_ebook_stylesheet}', '{smd_ebook_contents}');
 
-    // Loop for each article in the collection
+    // Loop for each article in the collection.
     foreach (ps('smd_ebook_articles') as $artid) {
         $article_cnt++;
 
         $id = str_replace('smd_ebook_article_', '', $artid);
-        $row = safe_row('*, UNIX_TIMESTAMP(Posted) AS uPosted, UNIX_TIMESTAMP(LastMod) AS uModified', 'textpattern', "ID = '" . doSlash($id) . "'");
+        $row = safe_row('*, UNIX_TIMESTAMP(Posted) AS uPosted, UNIX_TIMESTAMP(LastMod) AS uModified, UNIX_TIMESTAMP(Expires) AS uExpires', 'textpattern', "ID = '" . doSlash($id) . "'");
 
         if ($row) {
             // Initialize a few things
@@ -1348,7 +1348,7 @@ function smd_ebook_create()
 
             // Each of the items starting !isset() are only ever loaded _once_ from the
             // first article in which they are found.
-            // Begin by setting up the file names
+            // Begin by setting up the file names.
             if (!isset($firstfile)) {
                 $firstfile = $row['url_title'] . '.html';
                 $filebase = sanitizeForFile(($outfile === '') ? $row['url_title'] : $outfile);
@@ -1365,8 +1365,8 @@ function smd_ebook_create()
                 $toc_ref = 'toc';
             }
 
-            // Populate the unique ID entries direcly into the .opf template,
-            // as they're only used once each
+            // Populate the unique ID entries directly into the .opf template,
+            // as they're only used once each.
             if (!isset($reps['{smd_ebook_uid_ref}'])) {
                 $val = ps('smd_ebook_fld_uid');
 
@@ -1385,7 +1385,7 @@ function smd_ebook_create()
                 $template['ncx'] = str_replace('{smd_ebook_dtb_uid}', (($uid) ? '<meta name="dtb:uid" content="'.$full_uid.'" />' : ''), $template['ncx']);
             }
 
-            // Language
+            // Language.
             if (!isset($reps['{smd_ebook_md_lang}'])) {
                 $lang = get_pref('language');
                 $reps['{smd_ebook_md_lang}'] = '<dc:language>'.$lang.'</dc:language>';
@@ -1410,7 +1410,7 @@ function smd_ebook_create()
                 }
             }
 
-            // Doctype, namespace and charset
+            // Doctype, namespace and charset.
             if (!isset($reps['{smd_ebook_doctype}'])) {
                 if ($is_mobi) {
                     $reps['{smd_ebook_doctype}'] = '';
@@ -1423,7 +1423,7 @@ function smd_ebook_create()
                 }
             }
 
-            // Publication / modification date
+            // Publication / modification date.
             if (!isset($reps['{smd_ebook_md_date}'])) {
                 $reps['{smd_ebook_md_date}'] = '<dc:date>'.strftime('%Y-%m-%dT%H:%M:%SZ', $row['uPosted']).'</dc:date>';
             }
@@ -1432,12 +1432,12 @@ function smd_ebook_create()
                 $reps['{smd_ebook_md_modified}'] = '<meta property="dcterms:modified">'.strftime('%Y-%m-%dT%H:%M:%SZ', $row['uModified']).'</meta>';
             }
 
-            // Cover image
+            // Cover image.
             if (!isset($reps['{smd_ebook_md_cover}'])) {
                 if (isset($row['Image'])) {
                     $img = safe_row('*', 'txp_image', "id='" . intval($row['Image']) . "'");
 
-                    // Only GIFs, JPGs or PNGs need apply
+                    // Only GIFs, JPGs or PNGs need apply.
                     if ($img) {
                         $mime_type = (($img['ext'] === '.jpg' || $img['ext'] === '.jpeg') ? 'image/jpeg' : (($img['ext'] === '.gif') ? 'image/gif' : (($img['ext'] === '.png') ? 'image/png' : '')));
 
@@ -1450,7 +1450,7 @@ function smd_ebook_create()
                                 $ret = copy(get_pref('path_to_site') . DS . $img_dir . DS . $img_file, $ebook_path . $img_dest);
 
                                 if ($ret) {
-                                    // Write the cover image HTML
+                                    // Write the cover image HTML.
                                     $fp = fopen($ebook_path . $cover_file, "wb");
                                     $from = array('{smd_ebook_image_link}', '{smd_ebook_image_alt}');
                                     $to = array($img_dest, $img['alt']);
@@ -1470,7 +1470,7 @@ function smd_ebook_create()
             }
 
             // The following values can either come from the given field or be used verbatim
-            // Firstly the title, description, subject, publisher and chapter title
+            // Firstly the title, description, subject, publisher and chapter title.
             $setMany = array('chaptitle');
 
             foreach (array('title', 'description', 'subject', 'publisher', 'chaptitle') as $thingy) {
@@ -1492,18 +1492,18 @@ function smd_ebook_create()
                         }
 
                         // There are two titles: one for the metadata and one raw so if the title
-                        // has just been found, populate the raw title too
+                        // has just been found, populate the raw title too.
                         if ($thingy === 'title') {
                             $reps['{smd_ebook_title}'] = $content;
                         } elseif ($thingy === 'chaptitle') {
-                            // Chapter title has an associated heading level
+                            // Chapter title has an associated heading level.
                             $reps['{smd_ebook_chaptitle}'] = '<h'.$hdg.'>'.$content.'</h'.$hdg.'>';
                         }
                     }
                 }
             }
 
-            // Price (SRP) can also come from a field but it needs some special jiggery pokery
+            // Price (SRP) can also come from a field but it needs some special jiggery pokery.
             if (!isset($reps['{smd_ebook_md_srp}'])) {
                 $val = ps('smd_ebook_fld_srp');
 
@@ -1521,7 +1521,7 @@ function smd_ebook_create()
             }
 
             // Authornote is slightly different because it needs storing as a file,
-            // and needs adding to the .ncx (but not to the ToC)
+            // and needs adding to the .ncx (but not to the ToC).
             if (!isset($reps['{smd_ebook_manifest_authornote}'])) {
                 $val = ps('smd_ebook_fld_authornote');
 
@@ -1559,10 +1559,10 @@ function smd_ebook_create()
             //     here so the loadHTML() method is happy. The body will need reinjecting into
             //     the template after the ToC has been generated.
             //  2) The current HTML file's title is used instead of the overall book title.
-            //  3) parse() is called twice to simulate secondpass. TODO: fix this
+            //  3) parse() is called twice to simulate secondpass. @todo: fix this.
             $chap_title = isset($reps['{smd_ebook_chaptitle}']) ? $reps['{smd_ebook_chaptitle}'] : '';
             $skin = $txp_sections[$row['Section']]['skin'];
-            article_format_info($row); // Load article context
+            article_format_info($row); // Load article context.
             $html_content = str_replace($html_from, array($reps['{smd_ebook_doctype}'], $reps['{smd_ebook_namespace}'], $reps['{smd_ebook_charset}'], $encoding, $row['Title'], $chap_title, $sheet, parse(parse($row['Body_html']))), $template['doc']);
 
             // Trawl through the HTML content, either:
@@ -1578,7 +1578,7 @@ function smd_ebook_create()
 
             $doc = new DOMDocument();
 
-            // Use UNIX line endings to prevent &#13; appearing in the saved XML
+            // Use UNIX line endings to prevent &#13; appearing in the saved XML.
             $html_content = preg_replace('/\r\n/', "\n", $html_content);
 
             libxml_use_internal_errors(true);
@@ -1591,7 +1591,7 @@ function smd_ebook_create()
 
                 foreach ($items as $item) {
                     if ($autotoc && !$item->hasAttribute('id') && preg_match('/h(['.$autohed.'])/i', $item->nodeName, $matches)) {
-                        // It's a heading. Make the anchor chain based on the heading level
+                        // It's a heading. Make the anchor chain based on the heading level.
                         $anchor_parts = array_fill(0, $matches[1], 'sub');
                         $anchor = join('-', $anchor_parts). ++$elem_cnt;
                         $item->setAttribute('id', $anchor);
@@ -1611,7 +1611,7 @@ function smd_ebook_create()
                         // mb_convert_encoding() seems to bypass the odd behaviour where apostrophes
                         // would appear in the TOC as â€™. This may actually be a band-aid to circumvent
                         // problems with the encoding in DOMDocument: perhaps if appropriate encoding is
-                        // used there, this hack won't be necessary
+                        // used there, this hack won't be necessary.
 //						$node = mb_convert_encoding(trim($item->nodeValue), 'HTML-ENTITIES', 'utf-8');
                         $node = trim($item->nodeValue);
                         $from = array('{smd_ebook_file_name}', '{smd_ebook_nav_label}', '{smd_ebook_nav_hash}', '{smd_ebook_nav_idx}');
@@ -1619,7 +1619,7 @@ function smd_ebook_create()
                         $ncx[] = str_replace($from, $to, $template['nav']);
 
                         // Now it's the turn of the HTML TOC. Utilise Textile here to
-                        // create the toc list from ul or ol syntax
+                        // create the TOC list from ul or ol syntax.
                         $hashBits = do_list($hashval, '-');
                         $indent = count($hashBits);
 
@@ -1633,7 +1633,7 @@ function smd_ebook_create()
                         $toc[] = str_pad('', max(1, $indent-$offset), $wrapit) . $toc_cls.' ' . href($node, $cur_file.'#'.$hashval);
                     }
 
-                    // For ePub books, images need to be extracted separately
+                    // For ePub books, images need to be extracted separately.
                     if ($is_epub && $item->nodeName === 'img') {
                         $src = $item->getAttribute('src');
                         $bits = pathinfo($src);
@@ -1657,7 +1657,7 @@ function smd_ebook_create()
 
                                     // Add the file to the list of inline images, destined for the .smd file.
                                     // This list of images is merged with $lfout _after_ the chapter HTML
-                                    // content, so a list of images in the chapter appear below it
+                                    // content, so a list of images in the chapter appear below it.
                                     if (!in_array($bits['basename'], $image_list)) {
                                         $image_list[] = $bits['basename'];
                                     }
@@ -1674,7 +1674,7 @@ function smd_ebook_create()
                 // base requirements.
                 // Hackish: remove the body tag wrapper with substr() so when the html_content
                 // is shoved back into the template (which has a body tag already) there's no
-                // tag duplication
+                // tag duplication.
                 $html_content = substr($doc->saveXML($doc->getElementsByTagName('body')->item(0)), 6, -7);
 
                 // Swap out any line break placeholders. Note that the line break is replaced twice:
@@ -1738,7 +1738,7 @@ function smd_ebook_create()
                 }
             }
 
-            // Write the final HTML document to the file system
+            // Write the final HTML document to the file system.
             $fp = fopen($ebook_path . $cur_file, "wb");
             fwrite($fp, trim($html_content));
             fclose($fp);
@@ -1751,7 +1751,7 @@ function smd_ebook_create()
         }
     }
 
-    // Ensure any NULL replacements are cleared or throw errors
+    // Ensure any NULL replacements are cleared or throw errors.
     $reps['{smd_ebook_opf_file}'] = (!isset($reps['{smd_ebook_opf_file}'])) ? '' : $reps['{smd_ebook_opf_file}'];
     $reps['{smd_ebook_doctype}'] = (!isset($reps['{smd_ebook_doctype}'])) ? '' : $reps['{smd_ebook_doctype}'];
     $reps['{smd_ebook_namespace}'] = (!isset($reps['{smd_ebook_namespace}'])) ? '' : $reps['{smd_ebook_namespace}'];
@@ -1775,7 +1775,7 @@ function smd_ebook_create()
     }
 
     // All the replacements are set up so prepare for book generation
-    // First, create the TOC and write it to the filesystem
+    // First, create the TOC and write it to the filesystem.
     if ($toc_cnt > 0) {
         $reps['{smd_ebook_spine_toc}'] = '<itemref idref="'.$toc_ref.'" />';
 
@@ -1797,7 +1797,7 @@ function smd_ebook_create()
         $reps['{smd_ebook_spine_toc}'] = '';
     }
 
-    // Add the ncx waypoints to the reps array and generate the .ncx file
+    // Add the ncx waypoints to the reps array and generate the .ncx file.
     if ($ncx_cnt > 0) {
         $reps['{smd_ebook_ncx_doctype}'] = ($is_mobi) ? '<!DOCTYPE ncx PUBLIC "-//NISO//DTD ncx 2005-1//EN" "http://www.daisy.org/z3986/2005/ncx-2005-1.dtd">' : '';
         $reps['{smd_ebook_ncx_map}'] = join(n, $ncx);
@@ -1817,19 +1817,19 @@ function smd_ebook_create()
 
     if ($is_epub) {
         // Create supplemental files for ePub format
-        // First the mimetype
+        // First the mimetype.
         $fp = fopen($ebook_path . $mimetype_file, "wb");
         fwrite($fp, 'application/epub+zip');
         fclose($fp);
 
-        // Then the container
+        // Then the container.
         $fp = fopen($ebook_path . $container_file, "wb");
         $from = array('{smd_ebook_opf_file}');
         $to = array($opf_file);
         fwrite($fp, str_replace($from, $to, $template['inf']));
         fclose($fp);
 
-        // Then the landmarks
+        // Then the landmarks.
         $lmk_list = array();
         foreach ($landmarks as $type => $landmark) {
             $lmk_list[] = tag($landmark, 'li');
@@ -1842,7 +1842,7 @@ function smd_ebook_create()
         $article_refs[] = '<item id="landmarks" media-type="application/xhtml+xml" href="'.$lmk_file.'" />';
         $lfout[] = $lmk_file;
 
-        // Then any stylesheets
+        // Then any stylesheets.
         foreach ($sheetcontent as $sheet => $content) {
             $fp = fopen($ebook_path . $sheet.'.css', "wb");
             fwrite($fp, $content);
@@ -1877,7 +1877,7 @@ function smd_ebook_create()
         $reps['{smd_ebook_landmark_nav}'] = '';
     }
 
-    // Build the remaining manifest replacements and generate the OPF
+    // Build the remaining manifest replacements and generate the OPF.
     $reps['{smd_ebook_guide_extras}'] = ($guide_refs) ? join(n.t.t, $guide_refs) : '';
     $reps['{smd_ebook_manifest_items}'] = join(n.t.t, $article_refs);
     $reps['{smd_ebook_spine_items}'] = join(n, $article_spines);
@@ -1888,12 +1888,12 @@ function smd_ebook_create()
     fclose($fp);
     $lfout[] = $opf_file;
 
-    // Write the listfile, which contains a list of all the files used in this stage
+    // Write the listfile, which contains a list of all the files used in this stage.
     $fp = fopen($ebook_path . $listfile, "wb");
     fwrite($fp, join(n, $lfout));
     fclose($fp);
 
-    // Hand off to Stage 2 to do the deed
+    // Hand off to Stage 2 to do the deed.
     smd_ebook_generate($listfile, $opf_file, $bType, $ebook_folder);
 }
 
@@ -1908,7 +1908,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
     $report = array();
     $retval = NULL;
 
-    // Use passed in values in lieu of the one in the form
+    // Use passed in values in lieu of the one in the form.
     $opf_file = ($opf_file) ? $opf_file : ps('smd_ebook_opf_file');
     $listfile = ($listfile) ? $listfile : ps('smd_ebook_listfile');
     $booktype = ($booktype) ? $booktype : ps('smd_ebook_type');
@@ -1916,7 +1916,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
     $is_mobi = ($booktype === 'mobi');
     $is_epub = ($booktype === 'zip');
 
-    // File credentials
+    // File credentials.
     $outpath = get_pref('tempdir') . DS . $ebook_folder . DS;
     $outfile = ps('smd_ebook_pubfile');
 
@@ -1937,15 +1937,15 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
 
         @include_once txpath.'/include/txp_file.php';
 
-        // Copy the file to the files area
+        // Copy the file to the files area.
         $destfilepath = get_pref('file_base_path') . DS . $outfile;
         $filesize = filesize($outpath . $outfile);
         copy($outpath . $outfile, $destfilepath);
 
-        // Get the file category
+        // Get the file category.
         $filecat = get_pref('smd_ebook_file_cat', $smd_ebook_prefs['smd_ebook_file_cat']['default']);
 
-        // Read description and title from .opf
+        // Read description and title from .opf.
         $doc = new DOMDocument();
         $content = file_get_contents(get_pref('tempdir') . DS . $ebook_folder . DS . $opf_file);
         $dom_ok = $doc->loadXML($content);
@@ -1968,7 +1968,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
         $curid = safe_field('id', 'txp_file', "filename='".doSlash($outfile)."'");
 
         if ($curid) {
-            // Update existing database entry
+            // Update existing database entry.
             $ret = safe_update('txp_file',
                 "
                     title='" . doSlash($title) . "',
@@ -1987,7 +1987,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
             }
 
         } else {
-            // Make a new entry in the database for it
+            // Make a new entry in the database for it.
             $newid = file_db_add(doSlash($outfile), doSlash($filecat), '', doSlash($description), doSlash($filesize), doSlash($title));
 
             if ($newid) {
@@ -1998,7 +1998,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
         }
 
     } else {
-        // (Re)generate the book
+        // (Re)generate the book.
         $msg = '';
         $master_img_list = array();
 
@@ -2027,12 +2027,12 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
 
                 $zip = new smd_crunch_dZip($outpath . $outfile);
 
-                // Add the static files and folder structure
+                // Add the static files and folder structure.
                 $static_files = array(
                     'mimetype'      => $dest_dir,
                     'container.xml' => $meta_dir . DS,
                     'cover.html'    => $oebps_dir . DS,
-                    ''              => $oebps_img_dir . DS, // No file added yet, just create the folder
+                    ''              => $oebps_img_dir . DS, // No file added yet, just create the folder.
                 );
 
                 foreach ($static_files as $fn => $to) {
@@ -2045,6 +2045,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
                     }
 
                     $add_to_zip = str_replace($dest_dir, '', $to);
+
                     if ($add_to_zip !== '') {
                         $zip->addDir($add_to_zip);
                     }
@@ -2060,7 +2061,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
                     }
                 }
 
-                // Add each file given in the .smd master file
+                // Add each file given in the .smd master file.
                 $files = file($base_dir . $listfile);
                 $files = doArray($files, 'trim');
 
@@ -2077,7 +2078,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
                             $destfile = $oebps_dir . DS . $file;
                             if (copy($base_dir . $file, $destfile)) {
 
-                                // Translate fixed (image) paths into relative ones
+                                // Translate fixed (image) paths into relative ones.
                                 if ($ext === 'html') {
                                     $content = file_get_contents($destfile);
                                     $content = str_replace(get_pref('path_to_site') . DS . $img_dir . DS, 'images' . DS, $content);
@@ -2107,7 +2108,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
                                 $report[] = 'Added file: ' . $rel_dir . DS . $file;
                             }
 
-                            // Guard against adding the same image twice
+                            // Guard against adding the same image twice.
                             if (!in_array($file, $master_img_list)) {
                                 $zip->addFile($destfile, $rel_dir . DS . $file);
                                 $master_img_list[] = $file;
@@ -2120,7 +2121,7 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
                 $zip->save();
                 $report[] = 'Generated final ePub file: ' . $outpath . $outfile;
                 $msg = gTxt('smd_ebook_generate_ok');
-                $retval = 0; // Success! TODO: trap errors and report failure
+                $retval = 0; // Success! @todo trap errors and report failure.
 
                 break;
         }
@@ -2155,7 +2156,7 @@ function smd_ebook_download($fullpath)
         fclose($file);
     }
 
-    exit; // Don't call page end
+    exit; // Don't call page end.
 }
 
 // ------------------------
@@ -2172,7 +2173,7 @@ function smd_ebook_kindlegen($opf, $folder)
 }
 
 // ------------------------
-// Common buttons for the interface
+// Common buttons for the interface.
 function smd_ebook_buttons($curr='mgr')
 {
     global $smd_ebook_event;
@@ -2304,7 +2305,7 @@ function smd_ebook_get_stylesheets()
 }
 
 // ------------------------
-// Handle the prefs panel
+// Handle the prefs panel.
 function smd_ebook_prefs($msg = '')
 {
     global $smd_ebook_event, $smd_ebook_prefs, $step;
