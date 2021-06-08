@@ -1247,6 +1247,15 @@ EODOC;
     </xsl:template>
 </xsl:stylesheet>
 EOXSL;
+
+    $curr_skin = Txp::get('\Textpattern\Skin\Skin')->getEditing();
+    $overrides = safe_rows('name, Form', 'txp_form', "name like 'smd\_ebook\_%' AND skin='".doSlash($curr_skin)."'");
+
+    foreach ($overrides as $override) {
+        $platename = str_replace('smd_ebook_', '', $override['name']);
+        $template[$platename] = $override['Form'];
+    }
+
     return $template;
 }
 
@@ -1559,11 +1568,10 @@ function smd_ebook_create()
             //     here so the loadHTML() method is happy. The body will need reinjecting into
             //     the template after the ToC has been generated.
             //  2) The current HTML file's title is used instead of the overall book title.
-            //  3) parse() is called twice to simulate secondpass. @todo: fix this.
             $chap_title = isset($reps['{smd_ebook_chaptitle}']) ? $reps['{smd_ebook_chaptitle}'] : '';
             $skin = $txp_sections[$row['Section']]['skin'];
             article_format_info($row); // Load article context.
-            $html_content = str_replace($html_from, array($reps['{smd_ebook_doctype}'], $reps['{smd_ebook_namespace}'], $reps['{smd_ebook_charset}'], $encoding, $row['Title'], $chap_title, $sheet, parse(parse($row['Body_html']))), $template['doc']);
+            $html_content = str_replace($html_from, array($reps['{smd_ebook_doctype}'], $reps['{smd_ebook_namespace}'], $reps['{smd_ebook_charset}'], $encoding, $row['Title'], $chap_title, $sheet, parse($row['Body_html'])), $template['doc']);
 
             // Trawl through the HTML content, either:
             //  a) pulling out the given ToC entries.
