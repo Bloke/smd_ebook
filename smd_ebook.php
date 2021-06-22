@@ -1123,7 +1123,7 @@ EOLAND;
     // HTML template
     $template['doc'] = <<<EODOC
 {smd_ebook_doctype}
-<html{smd_ebook_namespace}>
+<html xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="{smd_ebook_lang}" lang="{smd_ebook_lang}"{smd_ebook_namespace}>
 <head>
     {smd_ebook_charset}
     <title>{smd_ebook_title}</title>
