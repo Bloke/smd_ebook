@@ -986,7 +986,7 @@ function smd_ebook_templates()
     // .opf file template
     $template['opf'] = <<<EOOPF
 <?xml version="1.0" encoding="{smd_ebook_encoding}"?>
-<package xmlns="http://www.idpf.org/2007/opf" version="3.0"{smd_ebook_uid_ref}>
+<package xmlns="http://www.idpf.org/2007/opf" version="3.0" xml:lang="{smd_ebook_lang}"{smd_ebook_uid_ref}>
     <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
         {smd_ebook_md_uid}
         {smd_ebook_md_title}
@@ -1402,7 +1402,7 @@ function smd_ebook_create()
 
             // Language.
             if (!isset($reps['{smd_ebook_md_lang}'])) {
-                $lang = get_pref('language');
+                $lang = get_pref('language_ui');
                 $reps['{smd_ebook_md_lang}'] = '<dc:language>'.$lang.'</dc:language>';
                 $reps['{smd_ebook_lang}'] = $lang;
             }
