@@ -987,7 +987,7 @@ function smd_ebook_templates()
     $template['opf'] = <<<EOOPF
 <?xml version="1.0" encoding="{smd_ebook_encoding}"?>
 <package xmlns="http://www.idpf.org/2007/opf" version="3.0" xml:lang="{smd_ebook_lang}"{smd_ebook_uid_ref}>
-    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
         {smd_ebook_md_uid}
         {smd_ebook_md_title}
         {smd_ebook_md_lang}
@@ -1420,7 +1420,7 @@ function smd_ebook_create()
                 }
 
                 if ($val) {
-                    $reps['{smd_ebook_md_creator}'] = '<dc:creator>'.$val.'</dc:creator>';
+                    $reps['{smd_ebook_md_creator}'] = '<dc:creator id="creator">'.$val.'</dc:creator><meta refines="#creator" property="role" scheme="marc:relators">aut</meta>';
                     $reps['{smd_ebook_creator}'] = $val;
                 }
             }
