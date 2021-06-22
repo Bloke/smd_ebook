@@ -1266,6 +1266,12 @@ function smd_ebook_create()
 {
     global $smd_ebook_prefs, $img_dir, $skin, $txp_sections;
 
+    $execution_time = get_pref('smd_ebook_script_execution', $smd_ebook_prefs['smd_ebook_script_execution']['default']);
+
+    if (is_numeric($execution_time)) {
+        ini_set('max_execution_time', $execution_time);
+    }
+
     include_once txpath.'/publish.php'; // For parse() etc.
 
     $textile = new \Textpattern\Textile\Parser();
@@ -2794,6 +2800,13 @@ function smd_ebook_get_prefs()
             'type'     => PREF_HIDDEN,
             'position' => 200,
             'default'  => $sitepath.DS.'kindle'.DS.'kindlegen',
+            'group'    => 'smd_ebook_settings',
+        ),
+        'smd_ebook_script_execution' => array(
+            'html'     => 'text_input',
+            'type'     => PREF_HIDDEN,
+            'position' => 250,
+            'default'  => 30,
             'group'    => 'smd_ebook_settings',
         ),
         'smd_ebook_auto_toc' => array(
