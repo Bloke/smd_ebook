@@ -1671,7 +1671,13 @@ function smd_ebook_create()
 
                         if ($mime_type) {
                             $img = safe_row('*', 'txp_image', "id='" . intval($bits['filename']) . "'");
-                            $img['name'] = trim($img['name']);
+
+                            if ($img) {
+                                // Image is in the database so extract its name.
+                                $img['name'] = trim($img['name']);
+                            } else {
+                                $img = array('name' => $bits['filename']);
+                            }
 
                             if ($img) {
                                 $ret = copy(get_pref('path_to_site') . DS . $img_dir . DS . $bits['basename'], $ebook_path . $bits['basename']);
@@ -2106,8 +2112,8 @@ function smd_ebook_generate($listfile='', $opf_file='', $booktype='', $ebook_fol
                         case 'ncx':
                         case 'opf':
                             $destfile = $oebps_dir . DS . $file;
-                            if (copy($base_dir . $file, $destfile)) {
 
+                            if (copy($base_dir . $file, $destfile)) {
                                 // Translate fixed (image) paths into relative ones.
                                 if ($ext === 'xhtml') {
                                     $content = file_get_contents($destfile);
