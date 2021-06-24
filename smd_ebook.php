@@ -94,8 +94,8 @@ smd_ebook_generate_ok => E-book generation successful
 smd_ebook_guide => Guide
 smd_ebook_heading_level => Chapter heading level
 smd_ebook_kindlegen_path => Path to kindlegen executable
-smd_ebook_lang_admin -> From admin language
-smd_ebook_lang_public -> From site language
+smd_ebook_lang_admin => From admin language
+smd_ebook_lang_public => From site language
 smd_ebook_lbl_acknowledgments => Acknowledgments
 smd_ebook_lbl_afterword => Afterword
 smd_ebook_lbl_appendix => Appendix
