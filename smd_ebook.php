@@ -76,6 +76,8 @@ smd_ebook_fld_chaptitle_fixed => &#8600; Text
 smd_ebook_fld_description => Get description from field
 smd_ebook_fld_description_fixed => &#8600; Text
 smd_ebook_fld_guide => Guide tags defined in field
+smd_ebook_fld_language => Book language
+smd_ebook_fld_language_fixed => &#8600; Text
 smd_ebook_fld_publisher => Get publisher from field
 smd_ebook_fld_publisher_fixed => &#8600; Text
 smd_ebook_fld_srp => Get SRP (price) from field
@@ -92,6 +94,8 @@ smd_ebook_generate_ok => E-book generation successful
 smd_ebook_guide => Guide
 smd_ebook_heading_level => Chapter heading level
 smd_ebook_kindlegen_path => Path to kindlegen executable
+smd_ebook_lang_admin -> From admin language
+smd_ebook_lang_public -> From site language
 smd_ebook_lbl_acknowledgments => Acknowledgments
 smd_ebook_lbl_afterword => Afterword
 smd_ebook_lbl_appendix => Appendix
@@ -345,6 +349,9 @@ function smd_ebook_ui($msg = '', $listfile = '', $report = '', $retval = '', $eb
         $fields = array(
             'description' => array(
                 'html' => 'textarea',
+            ),
+            'language' => array(
+                'html' => 'text_input',
             ),
             'authornote' => array(
                 'html' => 'textarea',
@@ -1345,7 +1352,7 @@ function smd_ebook_create()
     $sheet = join(n, $sheetlist);
 
     // The values used in the 'doc' template.
-    $html_from = array('{smd_ebook_doctype}', '{smd_ebook_namespace}', '{smd_ebook_charset}', '{smd_ebook_encoding}', '{smd_ebook_title}', '{smd_ebook_chaptitle}', '{smd_ebook_stylesheet}', '{smd_ebook_contents}');
+    $html_from = array('{smd_ebook_doctype}', '{smd_ebook_namespace}', '{smd_ebook_charset}', '{smd_ebook_encoding}', '{smd_ebook_title}', '{smd_ebook_chaptitle}', '{smd_ebook_stylesheet}', '{smd_ebook_contents}', '{smd_ebook_lang}');
 
     // Loop for each article in the collection.
     foreach (ps('smd_ebook_articles') as $artid) {
@@ -1402,7 +1409,16 @@ function smd_ebook_create()
 
             // Language.
             if (!isset($reps['{smd_ebook_md_lang}'])) {
-                $lang = get_pref('language_ui');
+                $lang = get_pref('smd_ebook_fld_language', $smd_ebook_prefs['smd_ebook_fld_language']['default']);
+
+                if ($lang === 'public') {
+                    $lang = get_pref('language');
+                } elseif ($lang === 'admin') {
+                    $lang = get_pref('language_ui');
+                } elseif ($lang === 'SMD_FIXED') {
+                    $lang = get_pref('smd_ebook_fld_language_fixed');
+                }
+
                 $reps['{smd_ebook_md_lang}'] = '<dc:language>'.$lang.'</dc:language>';
                 $reps['{smd_ebook_lang}'] = $lang;
             }
@@ -1554,7 +1570,7 @@ function smd_ebook_create()
                     // While it's 99% likely the actual title used for the eventual book has been found,
                     // there's a slim chance it hasn't. In that case, the current row's title is used as a fallback
                     $note_title = isset($reps['{smd_ebook_title}']) ? $reps['{smd_ebook_title}'] : $row['Title'];
-                    $note_content = str_replace($html_from, array($reps['{smd_ebook_doctype}'], $reps['{smd_ebook_namespace}'], $reps['{smd_ebook_charset}'], $encoding, $note_title, '', $sheet, $note_content), $template['doc']);
+                    $note_content = str_replace($html_from, array($reps['{smd_ebook_doctype}'], $reps['{smd_ebook_namespace}'], $reps['{smd_ebook_charset}'], $encoding, $note_title, '', $sheet, $note_content, $lang), $template['doc']);
 
                     $fp = fopen($ebook_path.$notefile, "wb");
                     fwrite($fp, trim($note_content));
@@ -1577,7 +1593,7 @@ function smd_ebook_create()
             $chap_title = isset($reps['{smd_ebook_chaptitle}']) ? $reps['{smd_ebook_chaptitle}'] : '';
             $skin = $txp_sections[$row['Section']]['skin'];
             article_format_info($row); // Load article context.
-            $html_content = str_replace($html_from, array($reps['{smd_ebook_doctype}'], $reps['{smd_ebook_namespace}'], $reps['{smd_ebook_charset}'], $encoding, $row['Title'], $chap_title, $sheet, parse($row['Body_html'])), $template['doc']);
+            $html_content = str_replace($html_from, array($reps['{smd_ebook_doctype}'], $reps['{smd_ebook_namespace}'], $reps['{smd_ebook_charset}'], $encoding, $row['Title'], $chap_title, $sheet, parse($row['Body_html']), $lang), $template['doc']);
 
             // Trawl through the HTML content, either:
             //  a) pulling out the given ToC entries.
@@ -1626,7 +1642,7 @@ function smd_ebook_create()
                         // would appear in the TOC as â€™. This may actually be a band-aid to circumvent
                         // problems with the encoding in DOMDocument: perhaps if appropriate encoding is
                         // used there, this hack won't be necessary.
-//						$node = mb_convert_encoding(trim($item->nodeValue), 'HTML-ENTITIES', 'utf-8');
+//                      $node = mb_convert_encoding(trim($item->nodeValue), 'HTML-ENTITIES', 'utf-8');
                         $node = trim($item->nodeValue);
                         $from = array('{smd_ebook_file_name}', '{smd_ebook_nav_label}', '{smd_ebook_nav_hash}', '{smd_ebook_nav_idx}');
                         $to = array($cur_file, $node, $hashval, $ncx_cnt);
@@ -1699,7 +1715,7 @@ function smd_ebook_create()
 
                 // Pass the extracted <body> tree into the doc template again so it regenerates
                 // the full <html>...</html> document.
-                $html_content = str_replace($html_from, array($reps['{smd_ebook_doctype}'], $reps['{smd_ebook_namespace}'], $reps['{smd_ebook_charset}'], $encoding, $row['Title'], '', $sheet, $html_content), $template['doc']);
+                $html_content = str_replace($html_from, array($reps['{smd_ebook_doctype}'], $reps['{smd_ebook_namespace}'], $reps['{smd_ebook_charset}'], $encoding, $row['Title'], '', $sheet, $html_content, $lang), $template['doc']);
             } else {
                 trigger_error(gTxt('smd_ebook_malformed'), E_WARNING);
             }
@@ -1816,7 +1832,7 @@ function smd_ebook_create()
         $reps['{smd_ebook_ncx_doctype}'] = ($is_mobi) ? '<!DOCTYPE ncx PUBLIC "-//NISO//DTD ncx 2005-1//EN" "http://www.daisy.org/z3986/2005/ncx-2005-1.dtd">' : '';
         $reps['{smd_ebook_ncx_map}'] = join(n, $ncx);
         $reps['{smd_ebook_manifest_ncx}'] = '<item id="ncx" media-type="application/x-dtbncx+xml" href="'.$ncx_file.'" />';
-//		$reps['{smd_ebook_spine_ncx}'] = '<itemref idref="ncx" />';
+//      $reps['{smd_ebook_spine_ncx}'] = '<itemref idref="ncx" />';
         $reps['{smd_ebook_spine_ncx_ref}'] = 'toc="ncx"';
         $ncx_file_content = trim(strtr($template['ncx'], $reps));
         $fp = fopen($ebook_path . $ncx_file, "wb");
@@ -1825,7 +1841,7 @@ function smd_ebook_create()
         $lfout[] = $ncx_file;
     } else {
         $reps['{smd_ebook_manifest_ncx}'] = '';
-//		$reps['{smd_ebook_spine_ncx}'] = '';
+//      $reps['{smd_ebook_spine_ncx}'] = '';
         $reps['{smd_ebook_spine_ncx_ref}'] = '';
     }
 
@@ -2344,7 +2360,7 @@ function smd_ebook_prefs($msg = '')
     echo n. <<<EOJS
 <script type="text/javascript">
 jQuery(function() {
-    jQuery("select[name='smd_ebook_fld_uid'], select[name='smd_ebook_fld_title'], select[name='smd_ebook_fld_chaptitle'], select[name='smd_ebook_fld_author'], select[name='smd_ebook_fld_description'], select[name='smd_ebook_fld_authornote'], select[name='smd_ebook_fld_subject'], select[name='smd_ebook_fld_publisher'], select[name='smd_ebook_fld_srp']").change(function() {
+    jQuery("select[name='smd_ebook_fld_uid'], select[name='smd_ebook_fld_title'], select[name='smd_ebook_fld_chaptitle'], select[name='smd_ebook_fld_author'], select[name='smd_ebook_fld_description'], select[name='smd_ebook_fld_authornote'], select[name='smd_ebook_fld_subject'], select[name='smd_ebook_fld_publisher'], select[name='smd_ebook_fld_srp'], select[name='smd_ebook_fld_language']").change(function() {
         var xtra = jQuery(this).attr('name') + '_fixed';
         if (jQuery('option:selected', this).val() === 'SMD_FIXED') {
             jQuery("input[name='"+xtra+"']").parent().parent().show('normal');
@@ -2542,6 +2558,18 @@ function smd_ebook_cf_list($name, $val = '')
 }
 
 // ------------------------
+// Select list of languages with a few extras
+function smd_ebook_lang_list($name, $val = '')
+{
+    $langs = Txp::get('\Textpattern\L10n\Lang')->installed();
+    $langs['public'] = gTxt('smd_ebook_lang_public');
+    $langs['admin'] = gTxt('smd_ebook_lang_admin');
+    $langs['SMD_FIXED'] = gTxt('smd_ebook_fixed');
+
+    return selectInput($name, $langs, $val, true, '', $name);
+}
+
+// ------------------------
 // Select list of custom fields with a few extras
 function smd_ebook_fld_list($name, $val = '')
 {
@@ -2640,7 +2668,7 @@ function smd_ebook_uid()
  * Checks whether the given string is a valid ISBN.
  *
  * @copyright  Copyright (c) 2009 Martijn Korse (http://devshed.excudo.net)
- * @param string $isbn	The number to check. Can be a 10- or 13-digit string, with or without space/hyphens betwwn digit groups
+ * @param string $isbn  The number to check. Can be a 10- or 13-digit string, with or without space/hyphens betwwn digit groups
  *
  * @return bool
  */
@@ -2808,6 +2836,21 @@ function smd_ebook_get_prefs()
             'position' => 250,
             'default'  => 30,
             'group'    => 'smd_ebook_settings',
+        ),
+        'smd_ebook_fld_language' => array(
+            'html'     => 'smd_ebook_lang_list',
+            'type'     => PREF_HIDDEN,
+            'position' => 5,
+            'default'  => '',
+            'group'    => 'smd_ebook_pubset',
+        ),
+        'smd_ebook_fld_language_fixed' => array(
+            'html'     => 'text_input',
+            'type'     => PREF_HIDDEN,
+            'position' => 6,
+            'default'  => '',
+            'group'    => 'smd_ebook_pubset',
+            'visible'  => false,
         ),
         'smd_ebook_auto_toc' => array(
             'html'     => 'yesnoradio',
