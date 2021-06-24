@@ -2561,7 +2561,13 @@ function smd_ebook_cf_list($name, $val = '')
 // Select list of languages with a few extras
 function smd_ebook_lang_list($name, $val = '')
 {
-    $langs = Txp::get('\Textpattern\L10n\Lang')->installed();
+    $langs = array();
+    $installed = Txp::get('\Textpattern\L10n\Lang')->available(TEXTPATTERN_LANG_INSTALLED|TEXTPATTERN_LANG_ACTIVE);
+
+    foreach ($installed as $key => $data) {
+        $langs[$key] = $data['name'];
+    }
+
     $langs['public'] = gTxt('smd_ebook_lang_public');
     $langs['admin'] = gTxt('smd_ebook_lang_admin');
     $langs['SMD_FIXED'] = gTxt('smd_ebook_fixed');
