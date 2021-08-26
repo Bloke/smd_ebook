@@ -1328,9 +1328,49 @@ function smd_ebook_create()
     $sheets = smd_ebook_get_stylesheets();
     $sheetlist = $sheetcontent = array();
     $sheet_count = 0;
+    $image_list = array();
 
     foreach ($sheets as $stylething) {
         $content = trim($stylething['css']);
+
+        // Extract any image references.
+        $mediaPat = '|(?:url\(\s*)(([^:/?#]+):)?(//([^/?#]*))?([^?#)]*)(\?([^#]*))?(#(.*))?|';
+        $lines = do_list($content, n);
+
+        foreach ($lines as $line) {
+            preg_match_all($mediaPat, $line, $matches,PREG_SET_ORDER);
+
+            foreach ($matches as $imgref) {
+                if (!empty($imgref[5])) {
+                    $bits = pathinfo($imgref[5]);
+                    $mime_type = (($bits['extension'] === 'jpg' || $bits['extension'] === 'jpeg') ? 'image/jpeg' : (($bits['extension'] === 'gif') ? 'image/gif' : (($bits['extension'] === 'png') ? 'image/png' : '')));
+
+                    if ($mime_type) {
+                        // Annoying cloned code, from image handler further on.
+                        // @todo: Find a way to modularise image handling.
+                        $ret = copy(get_pref('path_to_site') . DS . $img_dir . DS . $bits['basename'], $ebook_path . $bits['basename']);
+
+                        if ($ret) {
+                            if (!in_array($bits['basename'], $master_image_refs)) {
+                                $from = array('{smd_ebook_image_link}', '{smd_ebook_image_type}', '{smd_ebook_image_id}');
+                                $to = array('images' . DS . $bits['basename'], $mime_type, 'image-' . $img_cnt);
+
+                                $article_refs[] = str_replace($from, $to, $template['img']);
+                                $master_image_refs[] = $bits['basename'];
+                                $img_cnt++;
+                            }
+
+                            // Add the file to the list of inline images, destined for the .smd file.
+                            // This list of images is merged with $lfout _after_ the chapter HTML
+                            // content, so a list of images in the chapter appear below it.
+                            if (!in_array($bits['basename'], $image_list)) {
+                                $image_list[] = $bits['basename'];
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         if ($is_mobi && $content) {
             // Inline style tags.
@@ -1364,7 +1404,6 @@ function smd_ebook_create()
         if ($row) {
             // Initialize a few things
             $note_content = '';
-            $image_list = array();
             $reps['{smd_ebook_file_name}'] = $cur_file = $row['url_title'] . '.xhtml';
             $reps['{smd_ebook_encoding}'] = $encoding;
 
@@ -1867,9 +1906,11 @@ function smd_ebook_create()
 
         // Then the landmarks.
         $lmk_list = array();
+
         foreach ($landmarks as $type => $landmark) {
             $lmk_list[] = tag($landmark, 'li');
         }
+
         $fp = fopen($ebook_path . $lmk_file, "wb");
         $from = array('{smd_ebook_guide}', '{smd_ebook_encoding}', '{smd_ebook_lang}', '{smd_ebook_landmarks}');
         $to = array(gTxt('smd_ebook_guide'), $encoding, $lang, join(n.t, $lmk_list));
