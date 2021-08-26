@@ -1666,7 +1666,7 @@ function smd_ebook_create()
                         $item->setAttribute('id', $anchor);
                     }
 
-                    if ($item->hasAttribute('id')) {
+                    if ($item->hasAttribute('id') && $item->getAttribute('class') !== 'footnote') {
                         $ncx_cnt++;
                         $toc_cnt++;
                         $hashval = $item->getAttribute('id');
